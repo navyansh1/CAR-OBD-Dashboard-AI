@@ -27,8 +27,7 @@ each cylinder, the engine's own self-test results, build dates, and whole blocks
 manufacturer never documents. This project reads all of it, explains it in everyday language, and
 decodes the hidden parts by watching how they move while you drive.
 
-It was built in one long session with [Claude Code](https://claude.com/claude-code), on two real
-cars: a **2015 Hyundai Creta 1.6 petrol** and a **2010 Maruti Suzuki Swift 1.2 (K12M)**.
+It was built and tested on two real cars: a **2015 Hyundai Creta 1.6 petrol** and a **2010 Maruti Suzuki Swift 1.2 (K12M)**.
 
 ## What you get
 
@@ -166,7 +165,6 @@ makes work fine with standard OBD.
 - [python-OBD](https://github.com/brendan-w/python-OBD) for the OBD-II command set.
 - Hyundai Mode 22 definitions from [gdincu/HyundaiElantraCN7_OBD2_PIDs](https://github.com/gdincu/HyundaiElantraCN7_OBD2_PIDs).
 - Suzuki Swift definitions from the open [OBDb](https://github.com/OBDb/Suzuki-Swift) database.
-- Built with [Claude Code](https://claude.com/claude-code).
 
 ## License
 
