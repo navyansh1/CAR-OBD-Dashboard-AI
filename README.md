@@ -6,6 +6,7 @@
 
 Live gauges · health check · per-cylinder misfires · mileage and trip cost · past-trip replays ·
 and a reverse-engineering lab that cracks the manufacturer's **hidden** engine data.
+Works with any AI assistant: Claude, ChatGPT, Cursor, Antigravity, Gemini.
 
 **macOS (Apple Silicon)** · **Python 3.11+** · **any ELM327 Bluetooth adapter** · **read-only, never writes to the car**
 
@@ -128,6 +129,20 @@ Bluetooth. A bare Python process gets killed.
 - Never sends Mode 04 (clear codes) or any UDS service that writes, resets, unlocks, controls outputs or runs routines (`10`, `11`, `14`, `27`, `28`, `2E`, `2F`, `31`). The scanner refuses anything except `22`, `21`, `1A`, `19`, `18` and `3E`.
 - No data-ID probing on ABS, airbag, steering or radar modules (brute-force scans have been reported to store ESC faults on Kia cars). Those modules only get identity and fault-code reads.
 - **Parked mode:** when the car stops answering, the dashboard stops talking to the car entirely and only reads battery voltage from the adapter, so the car's computers can go to sleep. Unplug the adapter if you park for more than a few days: cheap adapters draw power continuously.
+
+## Works with any AI assistant
+
+Nothing here is tied to one AI. Use it with **Claude, ChatGPT, Cursor, Antigravity, Gemini, Copilot**,
+or whatever you prefer:
+
+- **Ask about your car.** While the dashboard runs, everything it knows is plain JSON on your Mac:
+  `http://127.0.0.1:8327/api/state` (live values, health, computers, decoded fields) and
+  `http://127.0.0.1:8327/api/trips` (saved trips). Point your assistant or agent at those URLs, or paste
+  the JSON, and ask things like *"Is anything wrong with my engine?"* or *"Why was my last trip's mileage low?"*
+- **Extend it.** It's a small, dependency-light Python + single-HTML project. Open the folder in any AI
+  coding tool and ask it to add a car profile, a new gauge, or decoding for your car's hidden data.
+- **Analyse your drives.** Every value is logged to `logs/drive-*.csv` and every trip to
+  `logs/<car>/trips/*.json`, ready for any AI or spreadsheet.
 
 ## Adding your car
 
