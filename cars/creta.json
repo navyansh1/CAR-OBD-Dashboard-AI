@@ -1,0 +1,20 @@
+{
+ "id": "creta",
+ "make": "Hyundai",
+ "short": "Creta",
+ "logo": "hyundai",
+ "name": "Hyundai Creta",
+ "variant": "1.6 Petrol",
+ "year": 2015,
+ "engine": "Gamma 1.6 MPI · 1,591 cc · 4 cylinders",
+ "battery": "60 Ah (MF45L)",
+ "fuel_tank": "55 litres",
+ "displacement_l": 1.591,
+ "volumetric_efficiency": 0.85,
+ "fuel_price": 103.0,
+ "currency": "₹",
+ "match": {
+  "cal_prefix": "GAGS"
+ },
+ "source": "Owner's manual and VIN"
+}

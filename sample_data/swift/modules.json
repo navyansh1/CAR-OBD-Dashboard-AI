@@ -1,0 +1,172 @@
+[
+ {
+  "address": "7E0",
+  "reply": "7E8",
+  "name": "Engine control (ECM)",
+  "present": true,
+  "ident": [
+   {
+    "req": "1A 8A",
+    "label": "Supplier",
+    "value": "33920-75J2*",
+    "hex": "5A 8A 33 33 39 32 30 2D 37 35 4A 32 2A 00 00 00 00 00"
+   }
+  ],
+  "reads": [
+   {
+    "req": "21 25",
+    "request": "2125",
+    "len": 32,
+    "hex": "02 01 01 00 E8 45 80 81 FF FF 51 09 C6 00 75 46 00 A6 23 00 00 00 00 FF 64 2A AF 00 BB 80 00 0B",
+    "text": "E Q uF # d*",
+    "values": [
+     {
+      "name": "POWER_STEERING_SIGNAL",
+      "label": "Power steering",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "STOP_LIGHT_SWITCH",
+      "label": "Stop light",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "CRUISE_CONTROL_LIVE_BRAKE_CANCEL_SWITCH",
+      "label": "Cruise control live brake cancel",
+      "value": 1.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "STARTER_SIGNAL",
+      "label": "Starter signal",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "STARTER_CONTROL",
+      "label": "Starter control",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "ELECTRICAL_LOAD_SIGNAL_1",
+      "label": "Electrical load signal 1",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "ELECTRICAL_LOAD_SIGNAL_2",
+      "label": "Electrical load signal 2",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SHIFT_SW_STATUS_P_RANGE",
+      "label": "Shift SW status, parking",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SHIFT_SW_STATUS_R_RANGE",
+      "label": "Shift SW status, reverse",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SHIFT_SW_STATUS_N_RANGE",
+      "label": "Shift SW status, neutral",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SHIFT_SW_STATUS_D_RANGE",
+      "label": "Shift SW status, drive",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SPORTS_MODE_SELECTION_SW",
+      "label": "Sports mode selection",
+      "value": 1.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SPORTS_SHIFT_UP_SW",
+      "label": "Sports shift up",
+      "value": 1.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "SPORTS_SHIFT_DOWN_SW",
+      "label": "Sports shift down",
+      "value": 1.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "PATTERN_SWITCH_PWR_M",
+      "label": "Pattern switch",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "NEUTRAL_POSITION_SW_SIGNAL",
+      "label": "Neutral position",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "TC_TERMINAL",
+      "label": "TC",
+      "value": 0.0,
+      "unit": "",
+      "kind": "flag"
+     },
+     {
+      "name": "A_C_COMPRESSOR",
+      "label": "A/C compressor",
+      "value": 1.0,
+      "unit": "",
+      "kind": "flag"
+     }
+    ]
+   },
+   {
+    "req": "21 28",
+    "request": "2128",
+    "len": 32,
+    "hex": "90 14 7C D1 FF CD FF 00 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 43 D2 68 54 A0 00 60 00",
+    "text": "| C hT `",
+    "values": [
+     {
+      "name": "2128_RAW",
+      "label": "Engine module 2128 first value, raw",
+      "value": 9442428.0,
+      "unit": "",
+      "kind": "value"
+     }
+    ]
+   }
+  ],
+  "dtcs": [],
+  "dtc_method": "not readable without a dealer session",
+  "scanned": 1795267302.659936
+ }
+]

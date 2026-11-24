@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+logs/
+OBD Bridge.app/
+cars/active.txt
+.DS_Store

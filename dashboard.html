@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car Live</title>
+<style>
+:root{
+  --bg:#f1f1f1; --surface:#ffffff; --surface-2:#f7f7f7; --ink:#111111; --ink-2:#3b3b3b;
+  --muted:#6f6f6f; --faint:#a6a6a6; --line:#e3e3e3; --line-2:#cdcdcd; --fill:rgba(0,0,0,.06);
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0a0a; --surface:#141414; --surface-2:#1b1b1b; --ink:#f2f2f2; --ink-2:#d2d2d2;
+    --muted:#8e8e8e; --faint:#5a5a5a; --line:#242424; --line-2:#383838; --fill:rgba(255,255,255,.07);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0a0a; --surface:#141414; --surface-2:#1b1b1b; --ink:#f2f2f2; --ink-2:#d2d2d2;
+  --muted:#8e8e8e; --faint:#5a5a5a; --line:#242424; --line-2:#383838; --fill:rgba(255,255,255,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin:0 auto;padding:0 24px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+.tech-only{display:none!important}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;height:64px}
+.logo{width:46px;height:29px;color:var(--ink);flex:none}
+.brand{display:flex;flex-direction:column;line-height:1.15}
+.brand b{font-size:18px;letter-spacing:-.02em}
+.brand span{font-size:12.5px;color:var(--muted)}
+.pill{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:99px;border:1px solid var(--line-2);font-size:13px;font-weight:600;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--ink);flex:none}
+.dot.on{background:var(--ink)}
+.dot.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.2}}
+.techmeta{font:12px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.spacer{flex:1}
+.btn{appearance:none;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:500 13px var(--sans);padding:8px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+.switch i{width:30px;height:18px;border-radius:9px;background:var(--line-2);position:relative;transition:background .2s}
+.switch i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:left .2s}
+body.tech .switch i{background:var(--ink)}
+body.tech .switch i::after{left:14px}
+.banner{margin:16px 0 0;padding:12px 16px;border:1px solid var(--ink);border-radius:12px;background:var(--surface);display:none;gap:10px;align-items:flex-start}
+.banner.show{display:flex}
+
+/* gauges */
+.hero{display:grid;grid-template-columns:1.25fr 1.25fr 1fr 1fr;gap:14px;margin:20px 0 8px}
+.hero-side{display:grid;grid-template-rows:1fr 1fr;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;min-width:0;position:relative}
+.gauge{display:flex;flex-direction:column;align-items:center;padding:14px 12px 12px}
+.gauge svg{width:100%;max-width:300px;height:auto;display:block}
+.gauge .g-val{font:700 50px/1 var(--mono);letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin-top:-82px}
+.gauge .g-unit{font-size:13px;color:var(--muted);margin-top:6px}
+.gauge .g-label{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:14px;display:flex;align-items:center;gap:6px}
+.mini .k{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;gap:6px}
+.mini .v{font:700 36px/1.1 var(--mono);letter-spacing:-.03em;margin-top:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mini .v small{font:500 14px var(--sans);color:var(--muted);letter-spacing:0;margin-left:5px}
+.mini .note{font-size:12.5px;color:var(--muted);margin-top:4px}
+.mini canvas{display:block;width:100%;height:30px;margin-top:8px}
+
+/* tabs */
+nav.tabs{display:flex;gap:4px;margin-top:18px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav.tabs button{appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font:600 15px var(--sans);padding:12px 16px;cursor:pointer;white-space:nowrap}
+nav.tabs button.on{color:var(--ink);border-bottom-color:var(--ink)}
+nav.tabs button .ct{font:600 11px var(--mono);margin-left:7px;padding:1px 6px;border-radius:99px;background:var(--fill);color:var(--ink-2)}
+nav.tabs button .ct:empty{display:none}
+section.pane{display:none;padding:22px 0 70px}
+section.pane.on{display:block}
+
+/* readings */
+h2.grp{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin:28px 0 12px;display:flex;align-items:center;gap:12px}
+h2.grp::after{content:"";flex:1;height:1px;background:var(--line)}
+h2.grp:first-child{margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rd .lbl{font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:flex-start;gap:6px;line-height:1.3;min-height:2.6em}
+.rd .row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:8px}
+.rd .val{font:700 28px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rd .val small{font:500 13px var(--sans);color:var(--muted);margin-left:4px;letter-spacing:0}
+.rd .mm{font-size:11.5px;color:var(--muted);text-align:right;white-space:nowrap;line-height:1.35}
+.rd .mm b{font:600 11.5px var(--mono);color:var(--ink-2)}
+.rd canvas{display:block;width:100%;height:32px;margin-top:10px}
+.rd .code{font:10.5px var(--mono);color:var(--faint);margin-top:6px}
+.rd.stale .val{color:var(--faint)}
+details.more{margin-top:28px}
+details.more summary{cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;list-style:none;display:flex;align-items:center;gap:10px}
+details.more summary::before{content:"+";font:600 16px var(--mono);width:16px}
+details.more[open] summary::before{content:"−"}
+details.more .grid{margin-top:12px}
+.statusrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.statusrow .card{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.statusrow .k{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center}
+.statusrow .v{font-size:14px;color:var(--ink-2);text-align:right}
+
+/* info button */
+.i{appearance:none;border:1.3px solid var(--faint);background:none;color:var(--muted);width:17px;height:17px;border-radius:50%;font:italic 700 11px/1 Georgia,serif;cursor:pointer;flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0;margin-top:1px}
+.i:hover,.i.open{border-color:var(--ink);color:var(--ink)}
+.tip{position:absolute;z-index:30;max-width:330px;background:var(--ink);color:var(--bg);font-size:13.5px;line-height:1.5;padding:12px 14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.tip b{display:block;margin-bottom:4px;font-size:14px}
+.tip .normal{margin-top:8px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--bg) 25%,transparent);font-size:12.5px;opacity:.85}
+
+/* health */
+.verdict{display:flex;align-items:center;gap:22px;padding:26px 28px}
+.verdict .big{width:72px;height:72px;border-radius:50%;border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;flex:none}
+.verdict.bad .big{background:var(--ink);color:var(--bg)}
+.verdict h3{margin:0;font-size:30px;letter-spacing:-.02em}
+.verdict p{margin:4px 0 0;color:var(--muted);font-size:15px;max-width:760px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.tile .k{font-size:13px;font-weight:600;color:var(--muted);display:flex;gap:6px;align-items:center}
+.tile .v{font:700 34px/1.15 var(--mono);margin-top:8px}
+.tile.alert{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tile.alert .k{color:var(--bg);opacity:.8}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.panel h3{margin:0 0 14px;font-size:16px;display:flex;align-items:center;gap:8px}
+.panel h3 .sub{font-weight:400;color:var(--muted);font-size:13px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.li:last-child{border-bottom:0}
+.li .name{font-size:14.5px;display:flex;align-items:center;gap:6px}
+.li .sub{font-size:12.5px;color:var(--muted)}
+.badge{display:inline-block;font:600 12px var(--sans);padding:3px 10px;border-radius:99px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+.badge.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.badge.dim{color:var(--faint);border-color:var(--line)}
+.meter{height:6px;border-radius:3px;background:var(--line);position:relative;min-width:90px;flex:1;max-width:160px}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ink)}
+.code-card{display:flex;gap:14px;align-items:baseline;padding:12px 14px;border:1.5px solid var(--ink);border-radius:10px;margin-bottom:8px}
+.code-card b{font:700 17px var(--mono)}
+.empty{color:var(--muted);padding:4px 0}
+
+/* car */
+.carhero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:26px 28px}
+.carhero h3{margin:0;font-size:34px;letter-spacing:-.03em;line-height:1.1}
+.carhero .sub{color:var(--muted);font-size:15px;margin-top:6px}
+.vin{font:600 20px var(--mono);letter-spacing:.1em}
+.kv{display:grid;grid-template-columns:minmax(160px,240px) 1fr;font-size:14.5px}
+.kv > div{padding:10px 0;border-bottom:1px solid var(--line)}
+.kv > div:nth-child(odd){color:var(--muted);display:flex;gap:6px;align-items:center}
+.kv > div:nth-last-child(-n+2){border-bottom:0}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.mod{display:flex;flex-direction:column;gap:10px}
+.mod svg{width:34px;height:34px}
+.mod b{font-size:15px}
+.mod .sub{font-size:13px;color:var(--muted)}
+.mod.off{opacity:.45}
+
+/* decoding */
+.progress{height:10px;border-radius:5px;background:var(--line);overflow:hidden;margin:6px 0 4px}
+.progress i{display:block;height:100%;background:var(--ink)}
+.bmap{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));gap:3px;margin:6px 0 14px}
+.bmap .cell{aspect-ratio:1/1.25;border-radius:3px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:9.5px var(--mono);color:var(--faint);overflow:hidden}
+.bmap .cell.c0{opacity:.5}
+.bmap .cell.c1{background:color-mix(in srgb,var(--ink) 18%,transparent);color:var(--ink-2)}
+.bmap .cell.c2{background:color-mix(in srgb,var(--ink) 45%,transparent);color:var(--bg)}
+.bmap .cell.c3{background:var(--ink);color:var(--bg)}
+.bmap .cell.hit{outline:2px solid var(--ink);outline-offset:1px}
+.blk-h{display:flex;gap:10px;align-items:baseline;font-size:13.5px;font-weight:600}
+.blk-h span{font-weight:400;color:var(--muted);font-size:12.5px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:4px 0 16px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+.find{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.find:last-child{border-bottom:0}
+.find .n{font:700 22px var(--mono);min-width:110px;text-align:right}
+.find .t{font-size:14.5px}
+.find .t .sub{display:block;font-size:12.5px;color:var(--muted)}
+
+/* trip */
+.trip-hero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.trip-hero .card .k{font-size:13px;font-weight:600;color:var(--muted);display:flex;gap:6px;align-items:center;text-transform:uppercase;letter-spacing:.07em}
+.trip-hero .card .v{font:700 40px/1.1 var(--mono);letter-spacing:-.03em;margin-top:10px;white-space:nowrap}
+.trip-hero .card .v small{font:500 15px var(--sans);color:var(--muted);margin-left:5px;letter-spacing:0}
+.trip-hero .card .s{font-size:13px;color:var(--muted);margin-top:4px}
+.trip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:12px}
+.trip-grid .card .k{font-size:13px;color:var(--muted);font-weight:600;display:flex;gap:6px;align-items:center}
+.trip-grid .card .v{font:700 26px/1.15 var(--mono);margin-top:6px}
+.trip-grid .card .v small{font:500 13px var(--sans);color:var(--muted);margin-left:4px}
+.split{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line);margin-top:10px}
+.split i{display:block;height:100%}
+/* cylinders */
+.cyls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cyl{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:18px 12px}
+.cyl svg{width:64px;height:84px}
+.cyl b{font:700 30px var(--mono)}
+.cyl .sub{font-size:12.5px;color:var(--muted)}
+#cylsHome{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px}
+#cylsHome .cyl{padding:14px 8px 12px;gap:4px}
+#cylsHome .cyl svg{width:42px;height:56px}
+#cylsHome .cyl b{font-size:26px}
+@media (max-width:560px){#cylsHome{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+/* past trips */
+.hist{display:grid;grid-template-columns:290px minmax(0,1fr);gap:16px;align-items:start}
+.tcard{display:block;width:100%;text-align:left;appearance:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;font:inherit}
+.tcard:hover{border-color:var(--line-2)}
+.tcard.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tcard .d{font-weight:700;font-size:15px}
+.tcard .s{font-size:13px;color:var(--muted);margin-top:4px}
+.tcard .m{display:flex;gap:14px;margin-top:10px;font:600 14px var(--mono)}
+.tcard .m small{font:500 11px var(--sans);color:var(--muted);margin-left:3px}
+.th{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.th h3{margin:0;font-size:26px;letter-spacing:-.02em}
+.th .sub{color:var(--muted);font-size:14px}
+.ttiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ttiles .card .k{font-size:12.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.ttiles .card .v{font:700 26px/1.15 var(--mono);margin-top:6px;white-space:nowrap}
+.ttiles .card .v small{font:500 13px var(--sans);color:var(--muted);margin-left:4px}
+.chart{position:relative;margin-top:6px}
+.chart canvas{display:block;width:100%;height:120px;cursor:crosshair}
+.chart .ch{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:600;margin-top:12px}
+.chart .ch span{font:600 13px var(--mono);color:var(--ink-2)}
+.bars .row{display:grid;grid-template-columns:120px 1fr 64px;gap:10px;align-items:center;padding:5px 0;font-size:13px}
+.bars .bar{height:14px;border-radius:4px;background:var(--line);overflow:hidden}
+.bars .bar i{display:block;height:100%;background:var(--ink)}
+.bars .row span:last-child{text-align:right;font-family:var(--mono);color:var(--muted)}
+@media (max-width:900px){.hist{grid-template-columns:1fr}.ttiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* switch finder */
+.bgrid{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));gap:2px;margin:6px 0 12px}
+.bcol{display:grid;grid-template-rows:repeat(8,1fr);gap:2px}
+.bit{aspect-ratio:1/1;border-radius:2px;border:1px solid var(--line-2);background:transparent;transition:background .2s}
+.bit.on{background:var(--ink);border-color:var(--ink)}
+.bit.flip{outline:2px solid var(--ink);outline-offset:1px;animation:pulse 1s ease-in-out 3}
+.act.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:760px){.bgrid{grid-template-columns:repeat(16,minmax(0,1fr))}}
+/* hood */
+.subnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.subnav button{appearance:none;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font:500 13px var(--sans);padding:7px 13px;border-radius:99px;cursor:pointer}
+.subnav button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sub-pane{display:none}
+.sub-pane.on{display:block}
+/* tech views */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.hint{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+input.search{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:14px var(--sans);padding:8px 12px;border-radius:9px;width:260px;max-width:100%}
+.bytes span{display:inline-block;width:2.4ch;text-align:center;margin-right:3px;border-radius:3px}
+.bytes span.c1{background:var(--fill)}
+.bytes span.c2{background:var(--ink);color:var(--bg)}
+.console{background:var(--surface);border:1px solid var(--line);border-radius:12px;font:12px/1.6 var(--mono);height:62vh;overflow:auto;padding:10px 0}
+.console .ln{display:grid;grid-template-columns:90px 190px 1fr 56px;gap:12px;padding:0 14px;white-space:pre-wrap;word-break:break-all}
+.console .t,.console .ms{color:var(--faint)}
+.console .tx{font-weight:600}
+.console .ms{text-align:right}
+footer{color:var(--muted);font-size:12.5px;padding:20px 0 30px;border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+input:focus-visible,select:focus-visible,.btn:focus-visible,.i:focus-visible,nav.tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+@media (max-width:1100px){.hero{grid-template-columns:1fr 1fr}.tiles,.trip-hero,.cyls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .wrap{padding:0 16px}.hero{grid-template-columns:1fr}.cols{grid-template-columns:1fr}.kv{grid-template-columns:1fr}
+  .kv > div:nth-child(odd){border-bottom:0;padding-bottom:0}.brand span{display:none}.techmeta{display:none}
+  .bmap{grid-template-columns:repeat(16,minmax(0,1fr))}.gauge .g-val{font-size:40px;margin-top:-66px}
+  .console .ln{grid-template-columns:1fr;gap:0;padding:4px 14px;border-bottom:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <svg class="logo" id="logoHyundai" viewBox="0 0 64 40" role="img" aria-label="Hyundai"><ellipse cx="32" cy="20" rx="29.5" ry="17.5" fill="none" stroke="currentColor" stroke-width="3"/>
+      <path d="M19.5 8.6 24.6 8.2 20.4 31.8 15.3 31.4Z M44.4 8.2 49.5 8.6 44.7 31.4 39.6 31.8Z M22.3 21.2 43.6 17.2 43 20.4 21.7 24.6Z" fill="currentColor"/></svg><svg class="logo" id="logoSuzuki" viewBox="0 0 64 40" role="img" aria-label="Suzuki" hidden><path d="M44 5H24L13 15l13 6-12 14h26l11-10-13-6z" fill="none" stroke="currentColor" stroke-width="0"/><path d="M45.5 4.5H25.2L12.6 15.4 34.8 22.1 26 28.3h-8.4l-4.6 7.2h20.3l12.6-10.9-22.2-6.7 8.8-6.2h8.4z" fill="currentColor"/></svg>
+    <div class="brand"><b id="carName">Car Live</b><span id="carSub">Live data from the car's computers</span></div>
+    <div class="pill"><span class="dot" id="dot"></span><span id="connText">Starting</span></div>
+    <select class="btn" id="carSel" title="Switch car profile" aria-label="Car profile"></select>
+    <span class="techmeta tech-only" id="connMeta"></span>
+    <div class="spacer"></div>
+    <button class="btn primary" id="tripBtn" style="font-size:14px;padding:9px 16px">Start trip</button>
+    <a class="btn" href="/api/csv" title="Download everything recorded this session (CSV)">Download data</a>
+    <button class="btn" id="themeBtn" aria-label="Switch light or dark">Theme</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="banner"><b id="bannerTitle"></b><span id="bannerText"></span><span class="spacer"></span><button class="btn" id="wakeBtn" hidden>Check now</button></div>
+
+  <div class="hero">
+    <div class="card gauge" id="g-rpm"></div>
+    <div class="card gauge" id="g-speed"></div>
+    <div class="hero-side">
+      <div class="card mini" id="m-coolant"></div>
+      <div class="card mini" id="m-battery"></div>
+    </div>
+    <div class="hero-side">
+      <div class="card mini" id="m-load"></div>
+      <div class="card mini" id="m-pedal"></div>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="live" class="on">Live readings<span class="ct" id="ctLive"></span></button>
+    <button data-tab="trip">Mileage &amp; trip</button>
+    <button data-tab="history">Past trips<span class="ct" id="ctTrips"></span></button>
+    <button data-tab="health">Health check<span class="ct" id="ctHealth"></span></button>
+    <button data-tab="car">My car</button>
+    <button data-tab="decode">Hidden <span class="mk">Hyundai</span> data<span class="ct" id="ctDecode"></span></button>
+    <button data-tab="hood">Under the hood</button>
+  </nav>
+
+  <!-- LIVE -->
+  <section class="pane on" id="pane-live">
+    <h2 class="grp">Cylinder health <button class="i" data-info="cylinders"></button></h2>
+    <div class="cyls" id="cylsHome"></div>
+    <div id="liveGroups"></div>
+    <details class="more" id="moreBox"><summary>More readings</summary><div class="grid" id="moreGrid"></div></details>
+  </section>
+
+  <!-- TRIP -->
+  <section class="pane" id="pane-trip">
+    <div class="toolbar"><span class="hint" id="tripSince"></span><span class="spacer"></span><button class="btn" id="tripReset" hidden>Start a new trip</button></div>
+    <div class="trip-hero" id="tripHero"></div>
+    <div class="trip-grid" id="tripGrid"></div>
+    <div class="card panel" style="margin-top:14px"><h3>Where the time went <button class="i" data-info="timesplit"></button></h3><div id="tripSplit"></div></div>
+    <div class="card panel" style="margin-top:14px"><h3>Make mileage exact with a fill-up <button class="i" data-info="fillcal"></button></h3><div id="fillBox"></div></div>
+    <p class="hint" style="margin-top:14px;max-width:900px">Fuel is estimated from intake pressure, engine speed and air temperature (the 'speed-density' method). This car doesn't report its fuel use, so treat these as good estimates, not pump-exact. Price per litre is set in <span class="mono">car.json</span>.</p>
+  </section>
+
+  <!-- PAST TRIPS -->
+  <section class="pane" id="pane-history">
+    <div class="hist"><div id="tripList"></div><div id="tripDetail"><div class="card panel empty">Pick a trip.</div></div></div>
+  </section>
+
+  <!-- HEALTH -->
+  <section class="pane" id="pane-health">
+    <div class="card verdict" id="verdict"></div>
+    <div class="tiles" id="healthTiles"></div>
+    <div class="cols">
+      <div class="card panel"><h3>Fault codes <button class="i" data-info="codes"></button><span class="spacer"></span><button class="btn" id="refreshBtn">Check again</button></h3><div id="dtcList"></div></div>
+      <div class="card panel"><h3>Self-tests <button class="i" data-info="readiness"></button></h3><div class="list" id="readyList"></div></div>
+    </div>
+    <h2 class="grp" style="margin-top:26px">Cylinder by cylinder <button class="i" data-info="cylinders"></button></h2>
+    <div class="cyls" id="cyls"></div>
+    <div class="card panel" style="margin-top:14px"><h3>The engine's secret lab report <button class="i" data-info="mode06"></button></h3><div class="list" id="m06List"></div></div>
+    <div class="card panel" style="margin-top:14px"><h3>Other systems <button class="i" data-info="moduleFaults"></button></h3><div class="list" id="modFaults"></div></div>
+    <div class="card panel" id="freezePanel" style="margin-top:14px;display:none"><h3>Snapshot when the fault happened <button class="i" data-info="freeze"></button></h3><div class="list" id="freezeList"></div></div>
+  </section>
+
+  <!-- CAR -->
+  <section class="pane" id="pane-car">
+    <div class="card carhero"><div><h3 id="carTitle">—</h3><div class="sub" id="carLine"></div></div><div style="text-align:right"><div class="hint">Vehicle identification number</div><div class="vin" id="vin">—</div></div></div>
+    <div class="cols" style="margin-top:14px">
+      <div class="card panel"><h3>About this car</h3><div class="kv" id="carKv"></div></div>
+      <div class="card panel"><h3>Engine computer</h3><div class="kv" id="ecuKv"></div></div>
+    </div>
+    <h2 class="grp" style="margin-top:28px">Computers found in this car <button class="i" data-info="modules"></button></h2>
+    <div class="mods" id="modGrid"></div>
+  </section>
+
+  <!-- DECODE -->
+  <section class="pane" id="pane-decode">
+    <div class="card panel" style="padding:24px 26px">
+      <h3 style="font-size:22px;letter-spacing:-.02em;margin-bottom:8px"><span>Cracking <span class="mk">Hyundai</span>'s hidden engine data</span></h3>
+      <p style="margin:0 0 16px;color:var(--ink-2);max-width:860px">Beyond the standard readings every car shares, your <span class="car">Creta</span>'s engine computer has <b id="blkCount">13</b> secret data blocks that <span class="mk">Hyundai</span> doesn't document. To find out what's inside, the dashboard watches every number in them while the engine revs and the car drives. When one moves in perfect step with something we already know, like engine speed, we've cracked it.</p>
+      <div class="toolbar" style="margin:0 0 10px"><button class="btn primary" id="focusBtn">Start decoding (10 min)</button><span class="hint" id="focusHint">Turn this on, then rev the engine in neutral or go for a short drive.</span></div>
+      <div class="hint" id="progText"></div>
+      <div class="progress"><i id="progBar" style="width:0"></i></div>
+    </div>
+    <div class="card panel" style="margin-top:14px" id="watchPanel">
+      <h3>Switch finder <button class="i" data-info="switchfinder"></button><span class="spacer"></span><button class="btn primary" id="watchBtn">Start (2 min)</button></h3>
+      <div class="hint" id="watchHint" style="margin-bottom:10px">Engine on, parked. Press Start, then tap an action below <b>just before</b> you do it (press the brake, switch on the A/C…). Any bit that flips within 8 seconds gets tagged with that action.</div>
+      <div class="toolbar" id="watchActions"></div>
+      <div id="watchGrids"></div>
+      <div class="cols" style="margin-top:10px"><div><div class="hint" style="margin-bottom:6px">What each action changed</div><div class="list" id="watchResults"></div></div><div><div class="hint" style="margin-bottom:6px">Live log</div><div class="list" id="watchLog" style="font:12px var(--mono)"></div></div></div>
+    </div>
+    <div class="cols" style="margin-top:14px">
+      <div class="card panel"><h3>Discoveries <button class="i" data-info="discoveries"></button></h3><div id="finds"></div></div>
+      <div class="card panel"><h3>What the blocks look like <button class="i" data-info="bytemap"></button></h3>
+        <div class="legend"><span><i style="opacity:.5"></i>never changes</span><span><i style="background:color-mix(in srgb,var(--ink) 18%,transparent)"></i>changes a little</span><span><i style="background:color-mix(in srgb,var(--ink) 45%,transparent)"></i>changes</span><span><i style="background:var(--ink)"></i>changes a lot</span><span><i style="outline:2px solid var(--ink);outline-offset:1px"></i>cracked</span></div>
+        <div id="bmaps"></div></div>
+    </div>
+  </section>
+
+  <!-- UNDER THE HOOD -->
+  <section class="pane" id="pane-hood">
+    <div class="subnav" id="subnav">
+      <button data-sub="readings" class="on">Every reading</button>
+      <button data-sub="computers">Computers in detail</button>
+      <button data-sub="math">Decoding math</button>
+      <button data-sub="raw">Live conversation</button>
+      <button data-sub="bus">Network monitor</button>
+      <button data-sub="supported">Supported list</button>
+    </div>
+    <div class="sub-pane on" id="sub-readings">
+      <div class="card panel"><h3>Every number the car is sending <span class="sub">exact values, units and the standard OBD code for each</span></h3><div class="scroll"><table id="allTbl"></table></div></div>
+      <div class="card panel" style="margin-top:14px"><h3>Lab report, full numbers <span class="sub">Mode 06 · each test's measured value against its limits</span></h3><div class="scroll"><table id="m06Tbl"></table></div></div>
+    </div>
+    <div class="sub-pane" id="sub-computers">
+      <div class="toolbar"><button class="btn" id="modBtn">Rescan computers</button><span class="hint" id="modStatus"></span></div>
+      <div id="modTech"></div>
+    </div>
+    <div class="sub-pane" id="sub-math">
+      <div class="card panel"><h3>How each hidden number was cracked <span class="sub">byte position, data type, correlation (r) with the standard reading, and the conversion formula</span></h3><div class="scroll"><table id="reFields"></table></div></div>
+      <div class="card panel" style="margin-top:14px"><h3>Raw hidden blocks <span class="sub">latest bytes from each engine data block</span></h3><div class="scroll"><table id="reRaw"></table></div></div>
+    </div>
+  <div class="sub-pane" id="sub-bus">
+    <div class="card panel">
+      <h3>Passive CAN monitor (ATMA)</h3>
+      <p class="hint" style="margin:0 0 12px;max-width:820px">Listen-only. Pauses polling while it runs. Cheap adapters may overflow on a busy bus; a gateway may hide most traffic.</p>
+      <div class="toolbar" style="margin:0">
+        <select class="btn" id="sniffSecs"><option value="5">5 s</option><option value="10" selected>10 s</option><option value="20">20 s</option><option value="30">30 s</option></select>
+        <button class="btn primary" id="sniffBtn">Start capture</button><span class="hint" id="sniffStatus"></span>
+      </div>
+    </div>
+    <div class="card panel" style="margin-top:14px"><div class="scroll"><table id="sniffTbl"></table></div></div>
+  </div>
+
+  <!-- TECH: RAW -->
+  <div class="sub-pane" id="sub-raw">
+    <div class="toolbar">
+      <button class="btn" id="rawPause">Pause</button><button class="btn" id="rawClear">Clear</button>
+      <input class="search" id="rawFilter" placeholder="Filter, e.g. 010C or 7E8" autocomplete="off">
+      <span class="hint">Every question the dashboard asks the car (→) and the car's exact reply, as it happens.</span>
+    </div>
+    <div class="console" id="console"></div>
+  </div>
+
+  <!-- TECH: SUPPORTED -->
+  <div class="sub-pane" id="sub-supported">
+    <div class="card panel"><div class="scroll"><table id="supTbl"></table></div></div>
+  </div>
+  </section>
+</main>
+
+<div class="wrap"><footer><span>Read-only: this dashboard only listens. It never changes, resets or clears anything in the car.</span><span class="tech-only" id="footTech"></span></footer></div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let S = null, activeTab = "live";
+const H = {}, MAXH = 900, lastT = {}, cards = {};
+
+// ------------------------------------------------------------------ plain-English dictionary
+const F = {
+  RPM:{label:"Engine speed", group:"Engine", info:"How many times per minute the engine's crankshaft turns.", normal:"About 650–800 rpm at idle once warm. Most petrol engines rev to about 6,000–6,500."},
+  ENGINE_LOAD:{label:"Engine effort", group:"Engine", info:"How hard the engine is working compared with the most it could do at this speed.", normal:"15–30% at idle, close to 100% with your foot flat on the pedal."},
+  TIMING_ADVANCE:{label:"Spark timing", group:"Engine", info:"How early the spark plugs fire, in degrees before the piston reaches the top. The engine computer changes this many times a second for power and economy.", normal:"Around −5° to 15° at idle, higher when cruising."},
+  INTAKE_PRESSURE:{label:"Intake air pressure", group:"Engine", info:"Air pressure inside the engine's intake. At idle the throttle is nearly closed, so the engine 'sucks' and the pressure is low.", normal:"About 30–40 kPa at idle, close to outside air pressure (about 100 kPa) at full throttle."},
+  RUN_TIME:{label:"Running for", group:"Engine", info:"How long the engine has been running since it was started."},
+  SPEED:{label:"Road speed", group:"Driving", info:"Speed measured by the car itself. Your speedometer usually reads a few km/h higher on purpose."},
+  ACCELERATOR_POS_D:{label:"Accelerator pedal", group:"Driving", info:"How far the accelerator pedal is pressed. There's no cable: the pedal is a sensor, and the engine computer decides how far to open the throttle.", normal:"About 14% with your foot off. The sensor never reads zero."},
+  THROTTLE_POS:{label:"Throttle opening", group:"Driving", info:"How far the valve that lets air into the engine is open.", normal:"Around 12–15% at rest. It never fully closes."},
+  SHORT_FUEL_TRIM_1:{label:"Instant fuel correction", group:"Fuel & air", info:"Tiny second-by-second fuel adjustments the engine computer makes based on the oxygen sensor, to keep the air-fuel mix perfect.", normal:"Bounces around 0%. Staying within ±10% is healthy."},
+  LONG_FUEL_TRIM_1:{label:"Learned fuel correction", group:"Fuel & air", info:"A long-term fuel adjustment the engine has learned over many drives.", normal:"Within ±10% is healthy. A high positive number can point to an air leak or a weak fuel pump."},
+  COMMANDED_EQUIV_RATIO:{label:"Target air-fuel mix", group:"Fuel & air", info:"The mix of air and petrol the engine computer is aiming for, as 'lambda'. 1.00 is the chemically perfect mix: 14.7 kg of air for every 1 kg of petrol.", normal:"1.00 most of the time, a bit below 1 (richer) at full throttle."},
+  BAROMETRIC_PRESSURE:{label:"Outside air pressure", group:"Fuel & air", info:"Atmospheric pressure, measured by the car so it can adjust fuel at different altitudes.", normal:"About 101 kPa at sea level; lower in the hills."},
+  EVAPORATIVE_PURGE:{label:"Fuel vapour recycling", group:"Fuel & air", info:"Petrol vapour from the tank is caught in a charcoal canister and later burned in the engine instead of escaping into the air. This shows how open that purge valve is."},
+  O2_B1S1:{label:"Front oxygen sensor", group:"Exhaust", info:"Measures leftover oxygen in the exhaust before the catalytic converter. The engine computer uses it to fine-tune fuel.", normal:"Flicks quickly between about 0.1 V (lean) and 0.9 V (rich). The flicking is good."},
+  O2_B1S2:{label:"Rear oxygen sensor", group:"Exhaust", info:"Sits after the catalytic converter and checks that it's cleaning the exhaust.", normal:"A steady reading around 0.6–0.8 V means the converter is doing its job."},
+  CATALYST_TEMP_B1S1:{label:"Catalytic converter", group:"Exhaust", info:"Estimated temperature inside the catalytic converter, which turns harmful exhaust gases into harmless ones. It has to be hot to work.", normal:"About 400–800 °C while running."},
+  LONG_O2_TRIM_B1:{label:"Rear sensor correction", group:"Exhaust", info:"A small long-term correction based on the rear oxygen sensor."},
+  COOLANT_TEMP:{label:"Engine temperature", group:"Temperatures", info:"Temperature of the coolant flowing through the engine.", normal:"About 85–100 °C once warmed up."},
+  INTAKE_TEMP:{label:"Intake air temperature", group:"Temperatures", info:"Temperature of the air going into the engine. Engine-bay heat warms it at idle.", normal:"Hotter air is thinner, so the engine makes slightly less power."},
+  AMBIANT_AIR_TEMP:{label:"Outside temperature", group:"Temperatures", info:"Air temperature outside the car, as measured by the car."},
+  ELM_VOLTAGE:{label:"Battery voltage", group:"Electrical", info:"Voltage measured at the diagnostic port, which connects straight to the battery.", normal:"12.4–12.7 V with the engine off. 13.8–14.6 V running means the alternator is charging properly."},
+  CONTROL_MODULE_VOLTAGE:{label:"Engine computer power", group:"Electrical", info:"The voltage the engine computer itself is receiving.", normal:"Should closely match the battery voltage."},
+  DISTANCE_SINCE_DTC_CLEAR:{label:"Since fault memory was reset", group:"History", info:"Distance driven since the engine's fault memory was last cleared, by a mechanic's scan tool or by disconnecting the battery."},
+  WARMUPS_SINCE_DTC_CLEAR:{label:"Warm-ups since reset", group:"History", info:"How many times the engine has started cold and fully warmed up since the fault memory was last cleared."},
+  DISTANCE_W_MIL:{label:"Driven with warning light on", group:"History", info:"Distance driven while the check-engine light was on.", normal:"Should be 0."},
+  MAF:{label:"Air flowing into the engine", group:"Fuel & air", info:"Measured by the airflow sensor (MAF) in the intake. Petrol burns at a fixed ratio to air, so this is the most accurate way to know fuel use.", normal:"About 2–4 g/s at idle, 30+ g/s under hard acceleration."},
+  O2_S1_LAMBDA:{label:"Measured air-fuel mix", group:"Exhaust", info:"What the engine is actually burning, measured by the wideband sensor in the exhaust, as lambda. 1.00 is the perfect 14.7 : 1 mix; below 1 is rich (extra fuel), above 1 is lean. Ordinary scan apps only show the target, not this measurement.", normal:"Hovers around 1.00 when cruising, drops to ~0.85 under full throttle, jumps high when you lift off (fuel cut)."},
+  O2_S1_WR_CURRENT:{label:"Front air-fuel sensor", group:"Exhaust", info:"A wideband sensor that measures the exact air-fuel mix (not just rich or lean). Current near 0 mA means a perfect mix; negative is rich, positive is lean."},
+  COMMANDED_EGR:{label:"Exhaust gas recirculation", more:true, info:"How much exhaust the engine is told to feed back into the intake to cut emissions. Many petrol engines don't use it."},
+  ABSOLUTE_LOAD:{label:"Absolute engine load", more:true, info:"Another way of measuring engine effort, based on how much air enters each cylinder."},
+  RELATIVE_THROTTLE_POS:{label:"Throttle opening (relative)", more:true, info:"Throttle opening measured from its learned closed position."},
+  THROTTLE_POS_B:{label:"Throttle sensor 2", more:true, info:"The throttle has two sensors for safety. This is the second one; it should track the first."},
+  ACCELERATOR_POS_E:{label:"Accelerator pedal sensor 2", more:true, info:"The pedal also has two sensors for safety. This one should match the first."},
+  THROTTLE_ACTUATOR:{label:"Throttle motor command", more:true, info:"How far the engine computer is telling the electric throttle motor to open."},
+  FUEL_LEVEL:{label:"Fuel level (not reported)", more:true, info:"This car doesn't share its fuel gauge over standard OBD, so this reads 0."},
+};
+const DERIVED = {
+  AFR_MEASURED:{label:"Measured air-fuel ratio", info:"Kilograms of air per kilogram of petrol actually being burned right now, from the wideband sensor. 14.7 is perfect."},
+  AFR_COMMANDED:{label:"Air-fuel ratio", info:"Kilograms of air for every kilogram of petrol the engine is aiming for. 14.7 is perfect."},
+  MANIFOLD_VACUUM:{label:"Engine vacuum", info:"How hard the engine is 'sucking' on the intake: outside pressure minus intake pressure. High at idle, near zero at full throttle."},
+  TOTAL_FUEL_TRIM_1:{label:"Total fuel correction", info:"Instant plus learned fuel correction together. Within ±10% means the fuel system is healthy."},
+  FUEL_FLOW_EST:{label:"Fuel flow (estimate)", info:"Estimated petrol use per hour."},
+  ECONOMY_EST:{label:"Fuel economy (estimate)", info:"Estimated kilometres per litre right now."},
+  RPM_PER_KMH:{label:"Gear indicator", info:"Engine speed divided by road speed. Each gear gives its own steady number, so you can tell which gear you're in."},
+};
+const INFO = {
+  codes:{t:"Fault codes", d:"When the engine computer spots a problem, it stores a code like P0301 (cylinder 1 misfire) and may turn on the check-engine light. 'Confirmed' codes are real faults; 'developing' ones were seen once and are being watched; 'permanent' ones can only clear themselves after a repair is proven."},
+  readiness:{t:"Self-tests", d:"While you drive, the engine computer quietly tests its own emission systems: catalytic converter, oxygen sensors, misfire detection and more. 'Passed' means the test ran and everything was fine. 'Waiting for a drive' just means it hasn't had the right driving conditions yet in this trip; that's normal."},
+  mode06:{t:"Engine's own test results", d:"The actual numbers the engine computer measured during its self-tests, next to the limits it allows. The bar shows where the result sits inside the allowed range."},
+  moduleFaults:{t:"Other systems", d:"Apart from the engine, cars have separate computers for the ABS brakes, airbags, steering and so on. Each keeps its own fault list."},
+  freeze:{t:"Freeze frame", d:"When a fault is stored, the engine computer saves a snapshot of the conditions at that moment: speed, temperature, load and more."},
+  modules:{t:"Computers in the car", d:"A modern car is a network of small computers. This dashboard called each common diagnostic address for this make and listed the ones that answered. It only asks them to identify themselves and report faults; it never changes anything."},
+  discoveries:{t:"Discoveries", d:"Each line is a number hidden in the maker's private data that moves in perfect step with a known reading. That match tells us what it is and how to convert it."},
+  bytemap:{t:"The hidden blocks", d:"Each square is one number (one byte, 0–255) in a hidden data block from the engine computer. Darker squares change more while the engine runs; faint ones never change. Squares with an outline have been cracked."},
+  cylinders:{t:"Cylinder health", d:"Your engine has 4 cylinders. When one fails to burn its fuel properly (a 'misfire'), the crankshaft stumbles for a split second, and the engine computer notices and counts it, cylinder by cylinder. Most scan apps never show these counts. Zero is perfect; a few now and then is fine; a steadily climbing number on one cylinder points to a spark plug, coil or injector on that cylinder."},
+  fillcal:{t:"Fill-up calibration", d:"The dashboard estimates fuel from the air the engine breathes, but every engine breathes a little differently. Fill the tank to full, drive normally, then fill to full again and type in the litres the pump shows. The dashboard compares that with its own estimate and corrects itself. Each fill-up after that makes it more accurate."},
+  switchfinder:{t:"Switch finder", d:"The engine computer keeps on/off flags for switches like the brake pedal, clutch and A/C inside its private data. Each square here is one of those bits: filled means 1, empty means 0, and an outline means it just flipped. Do one action at a time and the dashboard tells you which bit belongs to which switch."},
+  timesplit:{t:"Where the time went", d:"How this trip's engine-on time splits between moving and standing still with the engine idling."},
+  mileage:{t:"Mileage", d:"Kilometres per litre, estimated from how much air the engine breathes (intake pressure × engine speed ÷ air temperature). Petrol engines burn a fixed ratio of air to fuel, so air in tells you fuel used."},
+  check:{t:"Check-engine light", d:"The orange engine-shaped light on your dashboard. It turns on when the engine computer has stored a fault that affects emissions."},
+  stored:{t:"Confirmed faults", d:"Problems the engine computer has seen more than once and stored."},
+  pending:{t:"Developing faults", d:"Problems seen once in this or the last drive. If they happen again, they become confirmed."},
+  permanent:{t:"Permanent faults", d:"Faults that can't be erased with a scan tool. They clear themselves only after the car proves the repair worked."},
+};
+const READY = {"Misfire":"Misfire detection","Fuel System":"Fuel system","Component":"Sensors & components","Catalyst":"Catalytic converter","Oxygen Sensor":"Oxygen sensors","Oxygen Sensor Heater":"Oxygen sensor heaters","Egr Vvt System":"Variable valve timing","Evaporative System":"Fuel vapour system","Heated Catalyst":"Heated catalyst","Secondary Air System":"Secondary air"};
+const MON = {O2_B1S1:"Front oxygen sensor",O2_B1S2:"Rear oxygen sensor",CATALYST_B1:"Catalytic converter",VVT_B1:"Variable valve timing",O2_HEATER_B1S1:"Front oxygen sensor heater",O2_HEATER_B1S2:"Rear oxygen sensor heater",EVAP_0_040:"Fuel vapour leak test",MISFIRE_CYLINDER_1:"Cylinder 1 misfires",MISFIRE_CYLINDER_2:"Cylinder 2 misfires",MISFIRE_CYLINDER_3:"Cylinder 3 misfires",MISFIRE_CYLINDER_4:"Cylinder 4 misfires",MISFIRE_GENERAL:"Misfires overall"};
+const MODNAME = {"7E0":["Engine computer","Fuel, spark and everything the engine does","engine"],"7E1":["Gearbox computer","Automatic transmission","gear"],"7D1":["ABS & stability control","Anti-lock brakes and skid control","brake"],"7D2":["Airbags","Airbag and seatbelt tensioners","airbag"],"7D4":["Power steering","Electric steering assist","wheel"],"7C6":["Instrument cluster","Speedometer, gauges and warning lights","gauge"],"7A0":["Body computer","Locks, lights, wipers","car"],"770":["Gateway & power module","Connects the car's networks","net"],"7B3":["Climate control","Air conditioning and heater","fan"],"7A5":["Smart key","Keyless entry and start","key"],"7C7":["Infotainment","Head unit and screen","screen"]};
+const ICON = {
+  engine:'<path d="M5 10h3l2-2h6l2 2h2v3h2v4h-2v2h-4l-2 2H9l-2-2H5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 13v4M5 15H2" stroke="currentColor" stroke-width="1.6"/>',
+  brake:'<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 6a11 11 0 0 0 0 12M20 6a11 11 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+  wheel:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.6 10.5h6M14.4 10.5h6M12 14.5v6" stroke="currentColor" stroke-width="1.6"/>',
+  gauge:'<path d="M4 16a8 8 0 1 1 16 0" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 16l4-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16" r="1.3" fill="currentColor"/>',
+  car:'<path d="M3 15l2-5a2 2 0 0 1 2-1.4h10A2 2 0 0 1 19 10l2 5v3h-2v1.5h-2.5V18h-9v1.5H5V18H3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="14.5" r="1" fill="currentColor"/><circle cx="16.5" cy="14.5" r="1" fill="currentColor"/>',
+  fan:'<circle cx="12" cy="12" r="1.6" fill="currentColor"/><path d="M12 10c0-4 1-6 3-6s2 3-3 6zM14 12c4 0 6 1 6 3s-3 2-6-3zM12 14c0 4-1 6-3 6s-2-3 3-6zM10 12c-4 0-6-1-6-3s3-2 6 3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+  airbag:'<circle cx="12" cy="7" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 20c0-5 2.5-8 6-8s6 3 6 8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+  gear:'<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" stroke-width="1.6"/>',
+  key:'<circle cx="8" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 12h9M18 12v3M21 12v2" stroke="currentColor" stroke-width="1.6"/>',
+  net:'<circle cx="12" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="19" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5M12 12l-6 4.5M12 12l6 4.5" stroke="currentColor" stroke-width="1.6"/>',
+  screen:'<rect x="3" y="5" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 20h6" stroke="currentColor" stroke-width="1.6"/>',
+};
+const icon = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k] || ICON.car}</svg>`;
+const GROUPS = ["__secret__", "Engine","Driving","Fuel & air","Exhaust","Temperatures","Electrical","History","Hyundai extras"];
+
+// ------------------------------------------------------------------ helpers
+function dec(unit, name, v){
+  if (name === "COMMANDED_EQUIV_RATIO") return 2;
+  if (/^O2_B\dS\d$/.test(name)) return 2;
+  switch(unit){ case "rpm": case "km/h": case "kPa": case "°C": case "km": case "s": case "": case "min": return 0; case "V": return 1; case "%": return 0; case "°": return 1; default: return Math.abs(v) < 10 ? 2 : 1; }
+}
+const TIMEY = new Set(["RUN_TIME","RUN_TIME_MIL","TIME_SINCE_DTC_CLEARED"]);
+function fmt(v, unit, name){
+  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (TIMEY.has(name)) return dur(unit === "min" ? v * 60 : v);
+  const d = dec(unit, name, v);
+  return Number(v).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function dur(s){ s = Math.round(s); const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60; return h ? `${h}h ${String(m).padStart(2,"0")}m` : `${m}m ${String(x).padStart(2,"0")}s`; }
+function ago(t){ if(!t) return ""; const d = Date.now()/1000 - t; if (d < 10) return "just now"; if (d < 60) return Math.round(d)+" seconds ago"; if (d < 3600) return Math.round(d/60)+" min ago"; return Math.round(d/3600)+" h ago"; }
+const unitOf = (r) => TIMEY.has(r.name) ? "" : (r.unit === "λ" ? "" : r.unit);
+const labelOf = (r) => (F[r.name] && F[r.name].label) || (r.name.startsWith("HY_") ? r.desc : r.desc);
+function cssv(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+// ------------------------------------------------------------------ info popovers
+let tipEl = null, tipBtn = null;
+function infoFor(key){
+  if (INFO[key]) return {t: INFO[key].t, d: INFO[key].d};
+  if (F[key]) return {t: F[key].label, d: F[key].info, n: F[key].normal};
+  if (DERIVED[key]) return {t: DERIVED[key].label, d: DERIVED[key].info};
+  return null;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".i");
+  if (tipEl){ tipEl.remove(); tipEl = null; if (tipBtn) tipBtn.classList.remove("open"); if (b === tipBtn){ tipBtn = null; return; } tipBtn = null; }
+  if (!b) return;
+  const inf = infoFor(b.dataset.info) || {t: b.dataset.title || "", d: b.dataset.text || ""};
+  if (!inf.d) return;
+  tipEl = document.createElement("div");
+  tipEl.className = "tip";
+  tipEl.innerHTML = `<b>${esc(inf.t)}</b>${esc(inf.d)}${inf.n ? `<div class="normal">Normal: ${esc(inf.n)}</div>` : ""}`;
+  document.body.appendChild(tipEl);
+  const r = b.getBoundingClientRect(), w = Math.min(330, window.innerWidth - 32);
+  tipEl.style.maxWidth = w + "px";
+  let left = r.left + window.scrollX - 12; left = Math.max(16, Math.min(left, window.scrollX + window.innerWidth - w - 16));
+  tipEl.style.left = left + "px"; tipEl.style.top = (r.bottom + window.scrollY + 8) + "px";
+  b.classList.add("open"); tipBtn = b;
+});
+const ib = (key) => `<button class="i" data-info="${esc(key)}" aria-label="What is this?">i</button>`;
+
+// ------------------------------------------------------------------ theme
+(function(){
+  let t = null;
+  try { t = localStorage.getItem("obd-theme"); } catch(e){}
+  const qt = new URLSearchParams(location.search).get("theme");
+  if (qt === "light" || qt === "dark") t = qt;
+  if (t) document.documentElement.dataset.theme = t;
+  $("themeBtn").onclick = () => {
+    const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nx = cur === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nx;
+    try { localStorage.setItem("obd-theme", nx); } catch(e){}
+    for (const g of [$("g-rpm"), $("g-speed")]) g.querySelector("svg").style.color = "var(--ink)";
+    redrawAll();
+  };
+})();
+
+// ------------------------------------------------------------------ sparkline
+function spark(canvas, pts, span = 120){
+  const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  if (canvas.width !== Math.round(w*dpr)) { canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr); }
+  const g = canvas.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  if (!pts || pts.length < 2) return;
+  const tEnd = pts[pts.length-1][0], tStart = tEnd - span, vis = pts.filter(p => p[0] >= tStart);
+  if (vis.length < 2) return;
+  let lo = Infinity, hi = -Infinity; for (const p of vis){ lo = Math.min(lo, p[1]); hi = Math.max(hi, p[1]); }
+  if (hi - lo < 1e-9){ hi += 1; lo -= 1; }
+  const X = t => (t - tStart) / span * w, Y = v => h - 2 - (v - lo) / (hi - lo) * (h - 4);
+  g.beginPath(); vis.forEach((p,i) => i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])));
+  g.lineWidth = 1.6; g.strokeStyle = cssv("--ink"); g.lineJoin = "round"; g.stroke();
+  g.lineTo(X(vis[vis.length-1][0]), h); g.lineTo(X(vis[0][0]), h); g.closePath(); g.fillStyle = cssv("--fill"); g.fill();
+}
+
+// ------------------------------------------------------------------ gauges
+function arcPath(cx, cy, r, a0, a1){
+  const p = (a) => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  const [x0,y0] = p(a0), [x1,y1] = p(a1);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+}
+const A0 = Math.PI * 0.75, A1 = Math.PI * 2.25;
+function buildGauge(el, cfg){
+  const cx = 150, cy = 150, r = 120;
+  let ticks = "";
+  for (let i = 0; i <= cfg.major; i++){
+    const a = A0 + (A1 - A0) * i / cfg.major, red = cfg.red != null && (cfg.max * i / cfg.major) >= cfg.red;
+    const c = Math.cos(a), s = Math.sin(a);
+    ticks += `<line x1="${cx + (r-14)*c}" y1="${cy + (r-14)*s}" x2="${cx + (r-(red?28:24))*c}" y2="${cy + (r-(red?28:24))*s}" stroke="currentColor" stroke-width="${red?3.5:2}" />`;
+    ticks += `<text x="${cx + (r-42)*c}" y="${cy + (r-42)*s + 4}" text-anchor="middle" font-size="12" fill="currentColor" opacity=".6" font-family="ui-monospace, SF Mono, monospace">${cfg.tickLabel(cfg.max * i / cfg.major)}</text>`;
+    if (i < cfg.major) for (let k = 1; k < 5; k++){
+      const b = A0 + (A1 - A0) * (i + k/5) / cfg.major;
+      ticks += `<line x1="${cx + (r-14)*Math.cos(b)}" y1="${cy + (r-14)*Math.sin(b)}" x2="${cx + (r-19)*Math.cos(b)}" y2="${cy + (r-19)*Math.sin(b)}" stroke="currentColor" stroke-width="1" opacity=".45"/>`;
+    }
+  }
+  el.innerHTML = `<svg viewBox="0 0 300 250" style="color:var(--ink)"><path d="${arcPath(cx,cy,r,A0,A1)}" fill="none" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>
+    <path class="arc" d="" fill="none" stroke="var(--ink)" stroke-width="10" stroke-linecap="round"/>${ticks}</svg>
+    <div class="g-val">—</div><div class="g-unit">${cfg.unit}</div><div class="g-label">${cfg.label} ${ib(cfg.key)}</div>`;
+  el._cfg = cfg;
+}
+function setGauge(el, v){
+  const cfg = el._cfg;
+  el.querySelector(".g-val").textContent = v == null ? "—" : Math.round(v).toLocaleString();
+  const f = v == null ? 0 : Math.max(0, Math.min(1, v / cfg.max));
+  el.querySelector(".arc").setAttribute("d", f > 0.002 ? arcPath(150,150,120,A0,A0 + (A1-A0)*f) : "");
+}
+buildGauge($("g-rpm"), {key:"RPM", label:"Engine speed", unit:"rpm", max:7000, major:7, red:6500, tickLabel:v => v/1000});
+buildGauge($("g-speed"), {key:"SPEED", label:"Road speed", unit:"km/h", max:200, major:10, tickLabel:v => v});
+const MINIS = [
+  {el:"m-coolant", name:"COOLANT_TEMP", k:"Engine temperature", note:(v) => v == null ? "" : v < 70 ? "Warming up" : v <= 105 ? "Normal" : "Hot"},
+  {el:"m-battery", name:"ELM_VOLTAGE", alt:"CONTROL_MODULE_VOLTAGE", k:"Battery", note:(v) => v == null ? "" : v >= 13.5 ? "Charging" : v >= 12.4 ? "Good" : v >= 12 ? "Low" : "Very low"},
+  {el:"m-load", name:"ENGINE_LOAD", k:"Engine effort", note:(v) => v == null ? "" : v < 35 ? "Easy" : v < 70 ? "Working" : "Hard"},
+  {el:"m-pedal", name:"ACCELERATOR_POS_D", alt:"THROTTLE_POS", k:"Accelerator", note:(v, r) => v == null ? "" : (r && r.name === "ACCELERATOR_POS_D" && v < 16) ? "Foot off" : ""},
+];
+MINIS.forEach(m => $(m.el).innerHTML = `<div class="k">${m.k} ${ib(m.name)}</div><div class="v"><span>—</span><small></small></div><div class="note"></div><canvas></canvas>`);
+function renderHero(live){
+  setGauge($("g-rpm"), live.RPM ? live.RPM.value : null);
+  setGauge($("g-speed"), live.SPEED ? live.SPEED.value : null);
+  for (const m of MINIS){
+    const r = live[m.name] || (m.alt && live[m.alt]), el = $(m.el);
+    el.querySelector(".v span").textContent = r ? fmt(r.value, r.unit, r.name) : "—";
+    el.querySelector(".v small").textContent = r ? r.unit : "";
+    el.querySelector(".note").textContent = r ? m.note(r.value, r) : "";
+    if (r) spark(el.querySelector("canvas"), H[r.name], 90);
+  }
+}
+
+// ------------------------------------------------------------------ live readings
+function groupEl(name){
+  let g = document.querySelector(`#liveGroups [data-group="${CSS.escape(name)}"]`);
+  if (g) return g;
+  g = document.createElement("div"); g.dataset.group = name;
+  g.innerHTML = `<h2 class="grp">${esc(name)}</h2><div class="grid"></div>`;
+  const rank = (n) => / secret data$/.test(n) ? 0 : (GROUPS.indexOf(n) < 0 ? 99 : GROUPS.indexOf(n));
+  const all = [...$("liveGroups").children], idx = rank(name);
+  const before = all.find(x => rank(x.dataset.group) > idx);
+  $("liveGroups").insertBefore(g, before || null);
+  return g;
+}
+function ensureCard(r){
+  if (cards[r.name]) return cards[r.name];
+  const f = F[r.name];
+  let parent;
+  if (r.name.startsWith("DEC_") || r.name.startsWith("HY_")) parent = groupEl(r.group || "Secret data").querySelector(".grid");
+  else if (f && f.more) parent = $("moreGrid");
+  else if (f) parent = groupEl(f.group).querySelector(".grid");
+  else parent = $("moreGrid");
+  const el = document.createElement("div");
+  el.className = "card rd";
+  const code = r.tag ? r.tag : r.mode ? `${String(r.mode).padStart(2,"0")} ${r.pid != null ? r.pid.toString(16).toUpperCase().padStart(2,"0") : ""}` : "AT RV";
+  const infoAttr = F[r.name] ? r.name : "";
+  const decText = r.name.startsWith("DEC_") ? `Read from the maker's private engine data (block ${parseInt((r.pid || "").slice(2), 16)}), which isn't part of standard OBD. This dashboard worked out where it lives by watching it move with the standard readings while you drove.${/CYL/.test(r.name) ? " Standard OBD gives one spark-timing number for the whole engine; here the engine computer is setting each cylinder separately, which is how it backs off one cylinder at a time when it detects knock." : ""}` : r.desc;
+  el.innerHTML = `<div class="lbl">${esc(labelOf(r))} ${infoAttr ? ib(infoAttr) : `<button class="i" data-title="${esc(labelOf(r))}" data-text="${esc(decText)}">i</button>`}</div>
+    <div class="row"><div class="val"><span>—</span><small></small></div><div class="mm"></div></div><canvas></canvas>
+    <div class="code tech-only">${esc(r.name)} · ${esc(code)}</div>`;
+  parent.appendChild(el);
+  return cards[r.name] = {el, val: el.querySelector(".val span"), unit: el.querySelector(".val small"), mm: el.querySelector(".mm"), canvas: el.querySelector("canvas")};
+}
+function renderLive(list, derived, info){
+  const now = Date.now()/1000;
+  for (const r of list){
+    const c = ensureCard(r);
+    c.val.textContent = fmt(r.value, r.unit, r.name);
+    c.unit.textContent = unitOf(r);
+    c.mm.innerHTML = r.min != null && !TIMEY.has(r.name) ? `low <b>${fmt(r.min, r.unit, r.name)}</b><br>high <b>${fmt(r.max, r.unit, r.name)}</b>` : "";
+    c.el.classList.toggle("stale", now - (r.t || 0) > 20);
+    if (c.el.offsetParent !== null) spark(c.canvas, H[r.name]);
+  }
+  // calculated
+  const g = groupEl("Calculated");
+  g.querySelector(".grid").innerHTML = derived.filter(d => DERIVED[d.name]).map(d => `<div class="card rd"><div class="lbl">${esc(DERIVED[d.name].label)} ${ib(d.name)}</div><div class="row"><div class="val"><span>${d.value == null ? "—" : Number(d.value).toLocaleString()}</span><small>${esc(d.unit === "rpm/(km/h)" ? "" : d.unit)}</small></div></div></div>`).join("");
+  g.style.display = derived.length ? "" : "none";
+  // status values
+  const st = groupEl("Status");
+  const fs = info.FUEL_STATUS && info.FUEL_STATUS.value, o2 = info.O2_SENSORS && info.O2_SENSORS.value;
+  const rows = [];
+  if (fs) rows.push(["Fuel control", /closed loop/i.test(fs) ? (/fault/i.test(fs) ? "Fine-tuning, with a fault" : "Fine-tuning with the oxygen sensor") : /open loop/i.test(fs) ? (/load|decel/i.test(fs) ? "Fixed mix (accelerating or slowing)" : "Fixed mix (warming up)") : fs,
+    "When warm, the engine computer fine-tunes fuel using the oxygen sensor ('closed loop'). When cold, or flat out, it uses a fixed recipe ('open loop')."]);
+  if (o2) rows.push(["Oxygen sensors fitted", o2.replace(/Sensor/g, "sensor"), "The oxygen sensors the engine computer reports. Usually one before and one after the catalytic converter."]);
+  const sg = st.querySelector(".grid");
+  if (sg) sg.className = "statusrow";
+  st.querySelector(".statusrow").innerHTML = rows.map(([k, v, i]) => `<div class="card"><div class="k">${esc(k)} <button class="i" data-title="${esc(k)}" data-text="${esc(i)}">i</button></div><div class="v">${esc(v)}</div></div>`).join("");
+  st.style.display = rows.length ? "" : "none";
+  $("moreBox").style.display = $("moreGrid").children.length ? "" : "none";
+}
+
+// ------------------------------------------------------------------ health
+function renderHealth(s){
+  const st = s.status, d = s.dtcs || {}, n = a => (a || []).length;
+  const total = n(d.stored) + n(d.pending) + n(d.permanent);
+  const mil = st ? st.mil : null;
+  const mods = ((s.modules && s.modules.list) || []).filter(m => m.present);
+  const modCodes = mods.reduce((k, m) => k + (m.dtcs || []).length, 0);
+  const bad = mil || total > 0 || modCodes > 0;
+  const waiting = st ? st.tests.filter(t => t.available && !t.complete).length : 0;
+  $("verdict").className = "card verdict" + (bad ? " bad" : "");
+  $("verdict").innerHTML = `<div class="big">${bad ? '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 6v8M12 17.5v.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>' : '<svg width="36" height="36" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</div>
+    <div><h3>${!st ? "Checking…" : bad ? "Needs attention" : "All good"}</h3><p>${!st ? "Reading the car's fault memory." : bad ? `${mil ? "The check-engine light is on. " : ""}${total ? total + " engine fault code" + (total > 1 ? "s" : "") + " stored. " : ""}${modCodes ? modCodes + " fault code" + (modCodes > 1 ? "s" : "") + " in other systems." : ""}` : `No fault codes in the engine${mods.length > 1 ? " or the other systems that answered" : ""}, and the check-engine light is off.${waiting ? ` ${waiting} self-test${waiting > 1 ? "s are" : " is"} waiting for a drive, which is normal.` : " Every self-test has passed."}`}</p></div>`;
+  $("healthTiles").innerHTML = [
+    ["check", "Check-engine light", mil == null ? "—" : mil ? "ON" : "Off", mil],
+    ["stored", "Confirmed faults", n(d.stored), n(d.stored) > 0],
+    ["pending", "Developing faults", n(d.pending), n(d.pending) > 0],
+    ["permanent", "Permanent faults", n(d.permanent), n(d.permanent) > 0],
+  ].map(([k, l, v, a]) => `<div class="card tile ${a ? "alert" : ""}"><div class="k">${l} ${ib(k)}</div><div class="v">${v}</div></div>`).join("");
+  $("ctHealth").textContent = total + modCodes ? total + modCodes : "";
+  const block = (title, arr) => arr && arr.length ? `<div class="hint" style="margin:4px 0 8px">${title}</div>` + arr.map(c => `<div class="code-card"><b>${esc(c[0])}</b><span>${esc(c[1] || "Manufacturer-specific code")}</span></div>`).join("") : "";
+  const any = block("Confirmed", d.stored) + block("Developing", d.pending) + block("Permanent", d.permanent);
+  $("dtcList").innerHTML = (any || `<div class="li"><span class="name">No fault codes stored</span><span class="badge">Clear</span></div>`) + `<div class="hint" style="margin-top:10px">Checked ${ago(d.updated)}</div>`;
+  const tests = st ? st.tests.filter(t => t.available) : [];
+  const cyc = {}; ((s.status_cycle && s.status_cycle.tests) || []).forEach(t => cyc[t.name] = t);
+  $("readyList").innerHTML = tests.length ? tests.map(t => {
+    const c = cyc[t.name], done = t.complete, now = c && c.available ? c.complete : null;
+    return `<div class="li"><div><div class="name">${esc(READY[t.name] || t.name)}</div><div class="sub">${now == null ? "" : now ? "Also passed on this drive" : "Not yet run on this drive"}</div></div><span class="badge ${done ? "" : "solid"}">${done ? "Passed" : "Waiting for a drive"}</span></div>`;
+  }).join("") : `<div class="empty">Waiting for the car…</div>`;
+  const m = s.mode06 || [];
+  $("m06List").innerHTML = m.length ? m.map(mon => {
+    const name = MON[mon.monitor] || mon.monitor.replace(/_/g, " ").toLowerCase().replace(/^./, c => c.toUpperCase());
+    const ok = mon.tests.every(t => t.passed);
+    const t = mon.tests[0];
+    const misfire = /^MISFIRE/.test(mon.monitor);
+    let detail = "";
+    if (misfire){ const cur = mon.tests.find(x => /current/i.test(x.desc)) || t; detail = `${fmt(cur.value, "", "")} misfires this trip`; }
+    else if (t && t.value != null && t.max != null && t.max > t.min){ detail = `Result sits ${Math.round((t.value - t.min) / (t.max - t.min) * 100)}% into the allowed range`; }
+    else detail = `${mon.tests.length} check${mon.tests.length > 1 ? "s" : ""}`;
+    const pct = t && t.max > t.min ? Math.max(2, Math.min(100, (t.value - t.min) / (t.max - t.min) * 100)) : (ok ? 100 : 0);
+    return `<div class="li"><div><div class="name">${esc(name)}</div><div class="sub">${esc(detail)}<span class="tech-only mono"> · ${mon.tests.map(x => `${esc(x.desc)}: ${x.value} ${esc(x.unit)} [${x.min}–${x.max}]`).join(" · ")}</span></div></div><div style="display:flex;gap:14px;align-items:center"><div class="meter"><i style="width:${misfire ? 100 : pct}%"></i></div><span class="badge ${ok ? "" : "solid"}">${ok ? "Pass" : "Fail"}</span></div></div>`;
+  }).join("") : `<div class="empty">Waiting for the car…</div>`;
+  $("modFaults").innerHTML = mods.length ? mods.filter(x => x.address !== "7E0").map(x => {
+    const nm = (MODNAME[x.address] || [x.name])[0];
+    const read = x.dtc_method && !/not/.test(x.dtc_method);
+    return `<div class="li"><div class="name">${esc(nm)}</div>${x.dtcs.length ? `<span class="badge solid">${x.dtcs.length} fault${x.dtcs.length > 1 ? "s" : ""}: ${esc(x.dtcs.map(c => c.code).join(", "))}</span>` : read ? `<span class="badge">No faults</span>` : `<span class="badge dim">Needs dealer tool</span>`}</div>`;
+  }).join("") : `<div class="empty">Scanning…</div>`;
+  $("freezePanel").style.display = (s.freeze || []).length ? "" : "none";
+  $("freezeList").innerHTML = (s.freeze || []).map(f => `<div class="li"><span class="name">${esc((F[f.name] && F[f.name].label) || f.desc)}</span><span class="mono">${esc(typeof f.value === "number" ? fmt(f.value, f.unit, f.name) : f.value)} ${esc(f.unit)}</span></div>`).join("");
+}
+$("wakeBtn").onclick = async () => { $("wakeBtn").disabled = true; await fetch("/api/wake", {method:"POST"}); setTimeout(() => $("wakeBtn").disabled = false, 3000); };
+$("refreshBtn").onclick = async () => { $("refreshBtn").disabled = true; await fetch("/api/refresh", {method:"POST"}); setTimeout(() => $("refreshBtn").disabled = false, 4000); };
+
+// ------------------------------------------------------------------ my car
+function kv(pairs){ return pairs.filter(p => p[1]).map(([k, v, i]) => `<div>${esc(k)}${i ? " " + `<button class="i" data-title="${esc(k)}" data-text="${esc(i)}">i</button>` : ""}</div><div>${v}</div>`).join(""); }
+function renderCar(s){
+  const v = s.vehicle || {}, p = v.profile || {}, c = s.conn || {};
+  $("carTitle").textContent = [p.name, p.variant].filter(Boolean).join(" ") || v.maker || "Your car";
+  $("carLine").textContent = [p.year || (v.model_year_candidates || []).slice(-1)[0], p.engine].filter(Boolean).join(" · ");
+  $("vin").textContent = v.vin || "—";
+  const mods = ((s.modules && s.modules.list) || []);
+  const bcm = mods.find(m => m.address === "7A0"), built = bcm && (bcm.ident.find(i => i.label === "Manufacture date") || {}).value;
+  const info = s.info || {};
+  $("carKv").innerHTML = kv([
+    ["Made by", esc(v.maker || ""), "Read from the first three letters of the VIN."],
+    ["Model year", esc(p.year || (v.model_year_candidates || []).slice(-1)[0] || ""), "The 10th VIN character is a year code; 'F' means 2015."],
+    ["Body electronics built", esc(built || ""), "Manufacture date stored inside the body computer."],
+    ["Engine", esc(p.engine || "")],
+    ["Battery", esc(p.battery || "")],
+    ["Fuel tank", esc(p.fuel_tank || "")],
+    ["Emissions standard", esc(info.OBD_COMPLIANCE ? info.OBD_COMPLIANCE.value.replace("EOBD (Europe)", "EOBD (European on-board diagnostics)") : ""), "The diagnostics standard the engine computer follows."],
+  ]);
+  const ecm = mods.find(m => m.address === "7E0"), id = (lbl) => ecm && (ecm.ident.find(i => i.label === lbl) || {}).value;
+  $("ecuKv").innerHTML = kv([
+    ["Name", esc((v.ecu_names || [])[0] || "")],
+    ["Software", `<span class="mono">${esc(id("Software number") || "")}</span>`, "The software version the engine computer is running."],
+    ["Calibration", `<span class="mono">${esc((v.calibration_ids || [])[0] || "")}</span>`, "The engine 'tune': fuel maps, timing tables and limits loaded by the maker."],
+    ["Serial number", `<span class="mono">${esc(id("Serial number") || "")}</span>`],
+    ["Checksum", `<span class="mono">${esc((v.cvn || []).join(", "))}</span>`, "A fingerprint of the engine software. If anyone re-tunes the engine, this number changes."],
+    ["Connected through", esc(c.elm_version ? c.elm_version + " Bluetooth adapter" : "")],
+  ]);
+  const present = mods.filter(m => m.present);
+  $("modGrid").innerHTML = present.length ? present.map(m => {
+    const [nm, what, ic] = MODNAME[m.address] || [m.name, "", "car"];
+    const faults = m.dtcs.length ? `${m.dtcs.length} fault${m.dtcs.length > 1 ? "s" : ""}` : m.dtc_method && !/not/.test(m.dtc_method) ? "No faults" : "Responding";
+    return `<div class="card mod">${icon(ic)}<div><b>${esc(nm)}</b><div class="sub">${esc(what)}</div></div><span class="badge" style="align-self:flex-start">${esc(faults)}</span></div>`;
+  }).join("") : `<div class="empty">Looking for the car's computers…</div>`;
+}
+$("modBtn").onclick = async () => { $("modBtn").disabled = true; await fetch("/api/modules", {method:"POST"}); };
+
+// ------------------------------------------------------------------ hidden data / decoding
+const REF = {RPM:"engine speed",SPEED:"road speed",COOLANT_TEMP:"engine temperature",INTAKE_TEMP:"intake air temperature",INTAKE_PRESSURE:"intake air pressure",THROTTLE_POS:"throttle opening",ENGINE_LOAD:"engine effort",ABSOLUTE_LOAD:"absolute engine load",TIMING_ADVANCE:"spark timing",O2_B1S1:"front oxygen sensor",O2_B1S2:"rear oxygen sensor",CONTROL_MODULE_VOLTAGE:"engine computer voltage",ELM_VOLTAGE:"battery voltage",SHORT_FUEL_TRIM_1:"instant fuel correction",LONG_FUEL_TRIM_1:"learned fuel correction",CATALYST_TEMP_B1S1:"catalytic converter temperature",AMBIANT_AIR_TEMP:"outside temperature",ACCELERATOR_POS_D:"accelerator pedal",THROTTLE_ACTUATOR:"throttle motor",RELATIVE_THROTTLE_POS:"throttle opening",COMMANDED_EQUIV_RATIO:"target air-fuel mix",RUN_TIME:"engine running time",EVAPORATIVE_PURGE:"fuel vapour recycling",BAROMETRIC_PRESSURE:"outside air pressure",FUEL_LEVEL:"fuel level"};
+const REF_UNIT = {RPM:"rpm",SPEED:"km/h",COOLANT_TEMP:"°C",INTAKE_TEMP:"°C",INTAKE_PRESSURE:"kPa",THROTTLE_POS:"%",ENGINE_LOAD:"%",ABSOLUTE_LOAD:"%",TIMING_ADVANCE:"°",O2_B1S1:"V",O2_B1S2:"V",CONTROL_MODULE_VOLTAGE:"V",ELM_VOLTAGE:"V",CATALYST_TEMP_B1S1:"°C",ACCELERATOR_POS_D:"%",RUN_TIME:"s",BAROMETRIC_PRESSURE:"kPa"};
+let focusOn = false;
+$("focusBtn").onclick = async () => { await fetch("/api/focus?minutes=" + (focusOn ? 0 : 10), {method:"POST"}); };
+function renderDecode(s){
+  const re = s.re || {}, b = (re.blocks || []).filter(x => x.hdr === "7E0"), f = (re.fields || []);
+  $("ctDecode").textContent = (f.filter(x => x.primary).length + (re.groups || []).length) || "";
+  $("blkCount").textContent = b.length || 13;
+  const fu = s.conn && s.conn.focus_until; focusOn = !!fu;
+  $("focusBtn").textContent = focusOn ? "Stop decoding" : "Start decoding (10 min)";
+  $("focusHint").textContent = focusOn ? `Decoding: ${Math.max(0, Math.ceil((fu - Date.now()/1000) / 60))} min left. Rev the engine or drive now.` : "Turn this on, then rev the engine in neutral or go for a short drive.";
+  const active = b.filter(x => x.bytes.some(y => y.class !== "constant" && y.class !== "?"));
+  const need = 15, have = active.length ? active.reduce((k, x) => k + Math.min(need, x.n), 0) : 0, goal = Math.max(1, active.length * need);
+  const pct = Math.round(have / goal * 100);
+  $("progBar").style.width = pct + "%";
+  const totalBytes = b.reduce((k, x) => k + x.len, 0), moving = b.reduce((k, x) => k + x.bytes.filter(y => y.class !== "constant" && y.class !== "?").length, 0);
+  $("progText").innerHTML = `<b>${pct}%</b> of the samples needed · ${moving} of ${totalBytes} hidden numbers move · ${f.length} cracked so far`;
+  const hits = new Set(f.map(x => `${x.req} ${x.offset}`).concat((re.groups || []).flatMap(g => [0,1,2,3].map(k => `${g.req} ${g.offset + k}`))));
+  const groups = re.groups || [];
+  const conf = (x) => `<span class="badge ${x.confidence === "cracked" ? "solid" : ""}" style="margin-left:6px">${x.confidence === "cracked" ? "Cracked" : "Likely"}</span>`;
+  const liveDec = {}; (s.live || []).forEach(r => { if (r.name.startsWith("DEC_")) liveDec[r.name.slice(4)] = r.value; });
+  const rows = f.map(x => {
+    const u = REF_UNIT[x.ref] || "", nm = REF[x.ref] || x.ref;
+    if (x.primary && liveDec[x.ref] != null) x = Object.assign({}, x, {value_now: liveDec[x.ref]});
+    const title = x.primary ? `Hidden ${nm}` : `A value that moves ${x.r < 0 ? "opposite to" : "with"} ${nm}`;
+    const val = x.primary ? `${fmt(x.value_now, u, x.ref)}<small style="font:500 12px var(--sans);color:var(--muted);margin-left:4px">${esc(u)}</small>` : `<small style="font:500 13px var(--sans);color:var(--muted)">r ${x.r.toFixed(2)}</small>`;
+    return `<div class="find"><div class="n">${val}</div><div class="t">${esc(title)}${conf(x)}<span class="sub">Block ${parseInt(x.req.slice(2), 16)}, position ${x.offset + 1}${x.type.includes("16") ? "–" + (x.offset + 2) : ""} · tracks the standard reading ${Math.round(Math.abs(x.r) * 100)}%${x.hyundai_formula ? " · uses the maker's own conversion formula" : ""}${x.ref === "RUN_TIME" ? " · counts tenths of a second" : ""}</span></div></div>`;
+  });
+  const grows = groups.map(g => `<div class="find" style="align-items:flex-start"><div class="n" style="font-size:16px;line-height:1.5">${g.cylinders.map((c, k) => `C${k + 1} ${fmt(c.value_now, REF_UNIT[g.ref] || "", g.ref)}${esc(REF_UNIT[g.ref] || "")}`).join("<br>")}</div><div class="t">${esc((REF[g.ref] || g.ref).replace(/^./, c => c.toUpperCase()))}, cylinder by cylinder ${conf(g)}<span class="sub">Block ${parseInt(g.req.slice(2), 16)}, positions ${g.offset + 1}–${g.offset + 4}: four neighbouring numbers that each track ${esc(REF[g.ref] || g.ref)}, one per cylinder. Standard OBD only gives one number for the whole engine.</span></div></div>`);
+  $("finds").innerHTML = grows.concat(rows).join("") || `<div class="empty">${(re.samples || 0) < 60 ? "Collecting… press Start trip and rev the engine." : "Nothing cracked yet. The numbers need to move: rev the engine a few times or drive."}</div>`;
+  $("bmaps").innerHTML = b.map(x => {
+    const mx = Math.max(1, ...x.bytes.map(y => y.std));
+    const cells = x.bytes.map(y => {
+      const lvl = y.class === "constant" || y.class === "?" ? 0 : y.std / mx < 0.15 ? 1 : y.std / mx < 0.5 ? 2 : 3;
+      return `<div class="cell c${lvl} ${hits.has(`${x.req} ${y.i}`) ? "hit" : ""}" title="position ${y.i + 1}: ${y.hex}">${y.hex}</div>`;
+    }).join("");
+    return `<div class="blk-h">Block ${parseInt(x.req.slice(2), 16)} <span>${x.bytes.filter(y => y.class !== "constant").length} moving numbers</span></div><div class="bmap">${cells}</div>`;
+  }).join("") || `<div class="empty">Waiting for the engine computer…</div>`;
+}
+
+// ------------------------------------------------------------------ switch finder
+const ACTIONS = ["Brake pedal", "Clutch pedal", "A/C button", "Headlights", "Gear: neutral ↔ 1st", "Handbrake", "Driver door", "Indicator", "Blower fan", "Rev engine"];
+$("watchActions").innerHTML = ACTIONS.map(a => `<button class="btn act" data-a="${esc(a)}">${esc(a)}</button>`).join("");
+$("watchActions").querySelectorAll(".act").forEach(b => b.onclick = async () => { await fetch("/api/watch/label?name=" + encodeURIComponent(b.dataset.a), {method:"POST"}); });
+$("watchBtn").onclick = async () => { const running = S && S.watch && S.watch.running; await fetch(running ? "/api/watch/stop" : "/api/watch?seconds=120", {method:"POST"}); };
+function renderWatch(w){
+  if (!w) return;
+  const now = Date.now() / 1000;
+  $("watchBtn").textContent = w.running ? `Stop · ${Math.max(0, Math.round(w.until - now))} s left` : "Start (2 min)";
+  $("watchBtn").className = "btn " + (w.running ? "" : "primary");
+  const activeLabel = w.label && w.label_t && now - w.label_t < 8 ? w.label : null;
+  $("watchActions").querySelectorAll(".act").forEach(b => { b.classList.toggle("on", b.dataset.a === activeLabel); b.disabled = !w.running; });
+  const recent = new Set((w.events || []).filter(e => now - e.t < 3).map(e => `${e.block}|${e.byte}|${e.bit}`));
+  $("watchGrids").innerHTML = Object.entries(w.blocks || {}).map(([k, hex]) => {
+    const bytes = hex.match(/../g).map(h => parseInt(h, 16));
+    const cols = bytes.map((v, bi) => `<div class="bcol" title="byte ${bi}: ${v.toString(16).toUpperCase().padStart(2, "0")}">${[7,6,5,4,3,2,1,0].map(bit => `<div class="bit ${(v >> bit) & 1 ? "on" : ""} ${recent.has(`${k}|${bi}|${bit}`) ? "flip" : ""}"></div>`).join("")}</div>`).join("");
+    return `<div class="blk-h">Block ${esc(k.split(" ")[1])} <span>${bytes.length} bytes × 8 bits · top row is bit 7</span></div><div class="bgrid">${cols}</div>`;
+  }).join("") || `<div class="empty">${w.running ? "Reading…" : "Not running."}</div>`;
+  const by = {};
+  for (const e of (w.events || [])){ const k = e.label || "No action tapped"; (by[k] = by[k] || {})[`Block ${e.block.split(" ")[1]} · byte ${e.byte} · bit ${e.bit}`] = ((by[k] || {})[`Block ${e.block.split(" ")[1]} · byte ${e.byte} · bit ${e.bit}`] || 0) + 1; }
+  $("watchResults").innerHTML = Object.keys(by).length ? Object.entries(by).map(([lab, bits]) => `<div class="li"><span class="name">${esc(lab)}</span><span class="mono" style="text-align:right">${Object.entries(bits).map(([b, n]) => `${esc(b)} <span class="hint">×${n}</span>`).join("<br>")}</span></div>`).join("") : `<div class="empty">No flips yet.</div>`;
+  $("watchLog").innerHTML = (w.events || []).slice(-12).reverse().map(e => `<div class="li"><span>${fmtClock(e.t)} · byte ${e.byte} bit ${e.bit}: ${e.from}→${e.to}</span><span class="hint">${esc(e.label || "")}</span></div>`).join("") || `<div class="empty">—</div>`;
+}
+
+// ------------------------------------------------------------------ tech: bus, raw, supported
+function renderBus(sn){
+  $("sniffBtn").disabled = sn.running || !(S && S.conn.status === "connected");
+  $("sniffStatus").textContent = sn.running ? `Capturing… ${sn.lines} frames, ${sn.frames.length} IDs` : sn.started ? `Last: ${sn.lines} frames, ${sn.frames.length} IDs${sn.note ? " · " + sn.note : ""}` : "";
+  $("sniffTbl").innerHTML = sn.frames.length ? `<tr><th>ID</th><th>Frames</th><th>Rate</th><th>Data</th></tr>` + sn.frames.map(f => `<tr><td class="mono"><b>${esc(f.id)}</b></td><td class="mono">${f.count}</td><td class="mono">${f.hz == null ? "—" : f.hz + " Hz"}</td><td class="mono bytes">${f.data.map((x, i) => `<span class="${(f.changed[i]||0) === 0 ? "" : (f.changed[i] > f.count * .3 ? "c2" : "c1")}">${esc(x)}</span>`).join("")}</td></tr>`).join("") : `<tr><td class="empty">No capture yet</td></tr>`;
+}
+$("sniffBtn").onclick = async () => { $("sniffBtn").disabled = true; await fetch("/api/sniff?seconds=" + $("sniffSecs").value, {method:"POST"}); };
+let rawSince = 0, rawPaused = false, rawRows = [];
+$("rawPause").onclick = () => { rawPaused = !rawPaused; $("rawPause").textContent = rawPaused ? "Resume" : "Pause"; };
+$("rawClear").onclick = () => { rawRows = []; $("console").innerHTML = ""; };
+$("rawFilter").addEventListener("input", () => { $("console").innerHTML = ""; appendRaw(rawRows, true); });
+function appendRaw(rows, rebuild){
+  const q = $("rawFilter").value.trim().toLowerCase(), box = $("console");
+  const atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 30, frag = document.createDocumentFragment();
+  for (const r of rows){
+    if (q && !(r.tx + " " + r.rx.join(" ")).toLowerCase().includes(q)) continue;
+    const d = document.createElement("div"); d.className = "ln"; const t = new Date(r.t * 1000);
+    d.innerHTML = `<span class="t">${t.toLocaleTimeString([], {hour12:false})}</span><span class="tx">→ ${esc(r.tx)}</span><span>${r.rx.length ? r.rx.map(esc).join("<br>") : "(no response)"}</span><span class="ms">${r.ms} ms</span>`;
+    frag.appendChild(d);
+  }
+  box.appendChild(frag); while (box.childElementCount > 1500) box.firstChild.remove();
+  if (atBottom || rebuild) box.scrollTop = box.scrollHeight;
+}
+async function pollRaw(){
+  if (activeTab === "hood" && activeSub === "raw" && !rawPaused){
+    try { const rows = await (await fetch("/api/raw?since=" + rawSince)).json(); if (rows.length){ rawSince = rows[rows.length-1].n; rawRows = rawRows.concat(rows).slice(-1500); appendRaw(rows); } } catch(e){}
+  }
+  setTimeout(pollRaw, 500);
+}
+let supDone = -1;
+function renderSupported(list){
+  if (list.length === supDone) return; supDone = list.length;
+  $("supTbl").innerHTML = `<tr><th>Mode</th><th>PID</th><th>Name</th><th>Description</th><th>Polled</th></tr>` + list.map(x => `<tr><td class="mono">${String(x.mode).padStart(2,"0")}</td><td class="mono">${x.pid == null ? "" : x.pid.toString(16).toUpperCase().padStart(2,"0")}</td><td class="mono">${esc(x.name)}</td><td>${esc(x.desc)}</td><td>${x.polled ? "yes" : esc(x.note)}</td></tr>`).join("");
+}
+
+// ------------------------------------------------------------------ cylinders
+function cylData(s){
+  const out = [];
+  for (const mon of (s.mode06 || [])){
+    const m = /^MISFIRE_CYLINDER_(\d)$/.exec(mon.monitor);
+    if (!m) continue;
+    const avg = mon.tests.find(t => /ten/i.test(t.desc)), cur = mon.tests.find(t => /current/i.test(t.desc));
+    out.push({n: +m[1], now: cur ? cur.value : null, avg: avg ? avg.value : null, pass: mon.tests.every(t => t.passed)});
+  }
+  return out.sort((a, b) => a.n - b.n);
+}
+function cylSvg(level){
+  // level 0..1: how bad. Piston drawn inside a cylinder; spark at the top.
+  const fill = level <= 0 ? "none" : "var(--ink)";
+  return `<svg viewBox="0 0 64 84" aria-hidden="true"><rect x="10" y="10" width="44" height="64" rx="8" fill="none" stroke="currentColor" stroke-width="2.4"/>
+    <rect x="14" y="40" width="36" height="18" rx="3" fill="${fill}" stroke="currentColor" stroke-width="2" opacity="${level <= 0 ? 1 : .9}"/>
+    <path d="M32 58v14" stroke="currentColor" stroke-width="2.4"/><path d="M32 2v8M27 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M20 22l4 6M32 18v8M44 22l-4 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="${level <= 0 ? .85 : .25}"/></svg>`;
+}
+function renderCyls(el, s){
+  const c = cylData(s);
+  if (!c.length){
+    const done = s.dtcs && s.dtcs.updated;
+    el.innerHTML = done ? `<div class="card panel empty" style="grid-column:1/-1">This car's engine computer doesn't report misfires cylinder by cylinder (no Mode 06 data), so this panel stays empty.</div>` : `<div class="empty">Waiting for the engine's misfire counters…</div>`;
+    if (el.id === "cylsHome"){ const show = !done; el.style.display = show ? "" : "none"; el.previousElementSibling.style.display = show ? "" : "none"; }
+    return;
+  }
+  if (el.id === "cylsHome"){ el.style.display = ""; el.previousElementSibling.style.display = ""; }
+  el.innerHTML = c.map(x => {
+    const bad = (x.now || 0) > 0 || (x.avg || 0) > 0;
+    return `<div class="card cyl"><div style="color:var(--ink)">${cylSvg(bad ? Math.min(1, ((x.now || 0) + (x.avg || 0)) / 10) : 0)}</div>
+      <div class="sub" style="font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.07em">Cylinder ${x.n}</div>
+      <b>${x.now == null ? "—" : Math.round(x.now)}</b><div class="sub">misfires this trip</div>
+      <div class="sub">average of last 10 trips: <b style="font:600 13px var(--mono)">${x.avg == null ? "—" : fmt(x.avg, "", "")}</b></div>
+      <span class="badge ${x.pass ? "" : "solid"}">${x.pass ? (bad ? "Within limits" : "Perfect") : "Over the limit"}</span></div>`;
+  }).join("");
+}
+
+// ------------------------------------------------------------------ trip & mileage
+$("tripReset").onclick = async () => { await fetch("/api/trip/reset", {method:"POST"}); };
+$("tripBtn").onclick = async () => {
+  const active = S && S.trip && S.trip.active;
+  $("tripBtn").disabled = true;
+  await fetch(active ? "/api/trip/end" : "/api/trip/start", {method:"POST"});
+  if (active){ selectTab("history"); setTimeout(() => loadTrips(true), 700); }
+  setTimeout(() => $("tripBtn").disabled = false, 800);
+};
+function renderTripBtn(t){
+  const b = $("tripBtn");
+  if (!t) return;
+  if (t.active){ b.className = "btn"; b.innerHTML = `<span class="dot on pulse"></span>End trip · ${dur(Date.now()/1000 - t.started)}`; }
+  else { b.className = "btn primary"; b.textContent = "Start trip"; }
+}
+function renderTrip(t){
+  if (!t) return;
+  const cur = t.currency || "", lp100 = t.avg_kmpl ? (100 / t.avg_kmpl).toFixed(1) : null;
+  const how = t.method ? ` · fuel from ${t.method}` : "";
+  $("tripSince").textContent = (t.ended ? `Trip summary · ${dur(t.ended - t.started)} long · ended ${ago(t.ended)} · petrol at ${cur}${t.price}/L` : t.active ? `Trip running for ${dur(Date.now()/1000 - t.started)} · hidden-data decoding is on · petrol at ${cur}${t.price}/L` : `Counting since the dashboard started ${ago(t.started)} · press Start trip for a fresh trip · petrol at ${cur}${t.price}/L`) + how;
+  const big = (k, info, v, u, sub) => `<div class="card"><div class="k">${k} ${info ? ib(info) : ""}</div><div class="v">${v}<small>${u}</small></div><div class="s">${sub || ""}</div></div>`;
+  $("tripHero").innerHTML =
+    big("Mileage now", "mileage", t.kmpl_now != null ? t.kmpl_now.toFixed(1) : (t.lph != null ? "idle" : "—"), t.kmpl_now != null ? "km/L" : "", t.lph != null ? `burning ${t.lph.toFixed(1)} L per hour` : "") +
+    big("Trip average", "mileage", t.avg_kmpl != null ? t.avg_kmpl.toFixed(1) : "—", t.avg_kmpl != null ? "km/L" : "", lp100 ? `${lp100} L/100 km` : "needs a few hundred metres") +
+    big("Fuel used", "", t.fuel_l < 1 ? Math.round(t.fuel_l * 1000) : t.fuel_l.toFixed(2), t.fuel_l < 1 ? "ml" : "L", `including ${dur(t.idle_s)} of idling`) +
+    big("Trip cost", "", cur + (t.cost < 10 ? t.cost.toFixed(2) : Math.round(t.cost)), "", `${t.distance_km.toFixed(1)} km driven`);
+  const sm = (k, v, u) => `<div class="card"><div class="k">${k}</div><div class="v">${v}<small>${u}</small></div></div>`;
+  $("tripGrid").innerHTML = sm("Distance", t.distance_km.toFixed(2), "km") + sm("Engine on", dur(t.engine_s), "") +
+    sm("Top speed", Math.round(t.max_speed), "km/h") + sm("Highest rpm", Math.round(t.max_rpm).toLocaleString(), "rpm") +
+    sm("0–60 km/h best", t.best_0_60 != null ? t.best_0_60.toFixed(1) : "—", t.best_0_60 != null ? "s" : "") +
+    sm("0–100 km/h best", t.best_0_100 != null ? t.best_0_100.toFixed(1) : "—", t.best_0_100 != null ? "s" : "") +
+    sm("Hottest engine", t.max_coolant != null ? Math.round(t.max_coolant) : "—", "°C") +
+    sm("Spent standing still", cur + ((t.idle_fuel_l || 0) * t.price).toFixed(2), "") ;
+  const tot = Math.max(1, t.moving_s + t.idle_s), mv = t.moving_s / tot * 100;
+  $("tripSplit").innerHTML = `<div class="split"><i style="width:${mv}%;background:var(--ink)"></i><i style="width:${100 - mv}%;background:color-mix(in srgb,var(--ink) 25%,transparent)"></i></div>
+    <div class="hint" style="margin-top:8px;display:flex;justify-content:space-between"><span>Moving ${dur(t.moving_s)} (${Math.round(mv)}%)</span><span>Standing still, engine running ${dur(t.idle_s)} (${Math.round(100 - mv)}%)</span></div>`;
+}
+
+// ------------------------------------------------------------------ past trips
+let tripIndex = [], tripSel = null, tripDoc = null, hoverIdx = null;
+const fmtDate = (t) => new Date(t * 1000).toLocaleDateString(undefined, {weekday:"short", day:"numeric", month:"short"});
+const fmtTime = (t) => new Date(t * 1000).toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"});
+const fmtClock = (t) => new Date(t * 1000).toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit", second:"2-digit"});
+const fmtElapsed = (s) => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+async function loadTrips(selectNewest){
+  try { tripIndex = await (await fetch("/api/trips")).json(); } catch(e){ tripIndex = []; }
+  $("ctTrips").textContent = tripIndex.length || "";
+  renderTripList();
+  if (tripIndex.length && (selectNewest || !tripSel)) openTrip(tripIndex[0].id);
+}
+function renderTripList(){
+  $("tripList").innerHTML = tripIndex.length ? tripIndex.map(x => {
+    const s = x.summary || {}, cur = s.currency || "";
+    return `<button class="tcard ${x.id === tripSel ? "on" : ""}" data-id="${esc(x.id)}"><div class="d">${fmtDate(x.started)} · ${fmtTime(x.started)}</div>
+      <div class="s">${dur(x.ended - x.started)}${x.highlights && x.highlights.stops != null ? ` · ${x.highlights.stops} stop${x.highlights.stops === 1 ? "" : "s"}` : ""}</div>
+      <div class="m"><span>${(s.distance_km ?? 0).toFixed(1)}<small>km</small></span><span>${s.avg_kmpl != null ? s.avg_kmpl.toFixed(1) : "—"}<small>km/L</small></span><span>${cur}${Math.round(s.cost || 0)}</span></div></button>`;
+  }).join("") : `<div class="card panel empty">No trips yet. Press <b>Start trip</b> before your next drive and <b>End trip</b> when you park. Each trip is saved here.</div>`;
+  $("tripList").querySelectorAll(".tcard").forEach(b => b.onclick = () => openTrip(b.dataset.id));
+}
+async function openTrip(id){
+  tripSel = id; renderTripList();
+  try { tripDoc = await (await fetch("/api/trips/" + encodeURIComponent(id))).json(); } catch(e){ return; }
+  hoverIdx = null; renderTripDetail();
+  const hf = parseFloat(new URLSearchParams(location.hash.slice(1)).get("hover"));     // deep link: #tab=history&hover=0.45
+  if (hf >= 0 && hf <= 1){ hoverIdx = Math.round(hf * (tripDoc.series.t.length - 1)); requestAnimationFrame(() => requestAnimationFrame(drawTripCharts)); }
+}
+const CHARTS = [
+  {k:"SPEED", label:"Road speed", unit:"km/h", d:0},
+  {k:"RPM", label:"Engine speed", unit:"rpm", d:0},
+  {k:"LPH", label:"Fuel being burned", unit:"L/h", d:1},
+  {k:"ENGINE_LOAD", label:"Engine effort", unit:"%", d:0},
+  {k:"THROTTLE_POS", label:"Throttle opening", unit:"%", d:0},
+  {k:"TIMING_ADVANCE", label:"Spark timing", unit:"°", d:1},
+];
+function renderTripDetail(){
+  const d = tripDoc; if (!d) return;
+  const s = d.summary || {}, h = d.highlights || {}, cur = s.currency || "", t0 = d.started;
+  const rel = (t) => t == null ? "" : `at ${fmtElapsed(t - t0)} into the trip · ${fmtClock(t)}`;
+  const tile = (k, v, u) => `<div class="card"><div class="k">${k}</div><div class="v">${v}<small>${u}</small></div></div>`;
+  const bars = (title, list) => { const mx = Math.max(1, ...list.map(b => b.seconds)); return `<div class="card panel"><h3>${title}</h3><div class="bars">${list.map(b => `<div class="row"><span>${esc(b.label)}</span><div class="bar"><i style="width:${b.seconds / mx * 100}%"></i></div><span>${dur(b.seconds)}</span></div>`).join("")}</div></div>`; };
+  const hl = [
+    h.top_speed && ["Top speed", `${Math.round(h.top_speed.value)} km/h`, rel(h.top_speed.at)],
+    h.hardest_accel && h.hardest_accel.at && ["Hardest acceleration", `+${h.hardest_accel.value} km/h per sec`, rel(h.hardest_accel.at)],
+    h.hardest_brake && h.hardest_brake.at && ["Hardest braking", `−${h.hardest_brake.value} km/h per sec`, rel(h.hardest_brake.at)],
+    h.max_rpm && ["Highest engine speed", `${Math.round(h.max_rpm.value).toLocaleString()} rpm`, rel(h.max_rpm.at)],
+    h.longest_stop && h.longest_stop.value > 0 && ["Longest stop, engine running", dur(h.longest_stop.value), rel(h.longest_stop.at)],
+    h.stops != null && ["Stop-and-go", `${h.stops} full stop${h.stops === 1 ? "" : "s"}`, ""],
+  ].filter(Boolean);
+  $("tripDetail").innerHTML = `<div class="th"><div><h3>${fmtDate(d.started)}, ${fmtTime(d.started)}</h3><div class="sub">${dur(d.ended - d.started)} · ${fmtTime(d.started)} to ${fmtTime(d.ended)}</div></div></div>
+    <div class="ttiles">${tile("Distance", (s.distance_km ?? 0).toFixed(1), "km")}${tile("Fuel", s.fuel_l != null ? (s.fuel_l < 1 ? Math.round(s.fuel_l * 1000) : s.fuel_l.toFixed(2)) : "—", s.fuel_l < 1 ? "ml" : "L")}${tile("Cost", cur + (s.cost != null ? Math.round(s.cost) : "—"), "")}${tile("Mileage", s.avg_kmpl != null ? s.avg_kmpl.toFixed(1) : "—", "km/L")}
+      ${tile("Top speed", Math.round(s.max_speed || 0), "km/h")}${tile("Highest rpm", Math.round(s.max_rpm || 0).toLocaleString(), "")}${tile("Standing still", dur(s.idle_s || 0), "")}${tile("Moving", dur(s.moving_s || 0), "")}</div>
+    <div class="card panel" style="margin-top:12px"><h3>The drive, second by second <span class="sub">hover or drag across any chart</span></h3><div id="charts">${CHARTS.map(c => `<div class="chart"><div class="ch">${c.label}<span data-read="${c.k}"></span></div><canvas data-k="${c.k}"></canvas></div>`).join("")}<div class="hint" id="chartTime" style="margin-top:8px"></div></div></div>
+    <div class="cols" style="margin-top:12px"><div class="card panel"><h3>Highlights</h3><div class="list">${hl.map(x => `<div class="li"><div><div class="name">${esc(x[0])}</div>${x[2] ? `<div class="sub">${esc(x[2])}</div>` : ""}</div><span class="mono">${esc(x[1])}</span></div>`).join("")}</div></div>
+      ${h.speed_bands ? bars("Time at each speed", h.speed_bands) : ""}</div>
+    ${h.rpm_bands ? `<div style="margin-top:12px">${bars("Time at each engine speed", h.rpm_bands)}</div>` : ""}`;
+  drawTripCharts();
+  requestAnimationFrame(() => requestAnimationFrame(drawTripCharts));     // again once layout has settled
+  document.querySelectorAll("#charts canvas").forEach(cv => {
+    const move = (e) => { const r = cv.getBoundingClientRect(), x = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width; const t = d.series.t; hoverIdx = Math.max(0, Math.min(t.length - 1, Math.round(x * (t.length - 1)))); drawTripCharts(); };
+    cv.onmousemove = move; cv.ontouchmove = move; cv.onmouseleave = () => { hoverIdx = null; drawTripCharts(); };
+  });
+}
+function drawTripCharts(){
+  const d = tripDoc; if (!d) return;
+  const t = d.series.t, ink = cssv("--ink"), line = cssv("--line"), muted = cssv("--muted"), fill = cssv("--fill");
+  for (const cv of document.querySelectorAll("#charts canvas")){
+    const k = cv.dataset.k, v = d.series[k] || [], c = CHARTS.find(x => x.k === k);
+    const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr)){ cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    const vals = v.filter(x => x != null); if (!vals.length || t.length < 2) continue;
+    let lo = Math.min(0, ...vals), hi = Math.max(...vals); if (hi - lo < 1e-6) hi = lo + 1;
+    const L = 38, R = 6, T = 6, B = 16, X = (i) => L + (t[i] - t[0]) / (t[t.length - 1] - t[0]) * (w - L - R), Y = (y) => T + (1 - (y - lo) / (hi - lo)) * (h - T - B);
+    g.font = "10px ui-monospace, SF Mono, monospace"; g.fillStyle = muted; g.strokeStyle = line; g.lineWidth = 1;
+    for (const f of [0, .5, 1]){ const y = lo + (hi - lo) * f; g.beginPath(); g.moveTo(L, Y(y)); g.lineTo(w - R, Y(y)); g.stroke(); g.fillText(Math.round(y).toLocaleString(), 2, Y(y) + 3); }
+    const tot = t[t.length - 1] - t[0], step = tot > 1800 ? 600 : tot > 600 ? 300 : 120;
+    for (let s2 = 0; s2 <= tot; s2 += step){ const x = L + s2 / tot * (w - L - R); g.fillText(`${Math.round(s2 / 60)}m`, x - 6, h - 3); }
+    g.beginPath(); let started = false;
+    for (let i = 0; i < t.length; i++){ if (v[i] == null) continue; const x = X(i), y = Y(v[i]); started ? g.lineTo(x, y) : g.moveTo(x, y); started = true; }
+    g.strokeStyle = ink; g.lineWidth = 1.4; g.lineJoin = "round"; g.stroke();
+    g.lineTo(X(t.length - 1), Y(lo)); g.lineTo(X(0), Y(lo)); g.closePath(); g.fillStyle = fill; g.fill();
+    const rd = document.querySelector(`[data-read="${k}"]`);
+    if (hoverIdx != null){
+      const x = X(hoverIdx); g.strokeStyle = ink; g.lineWidth = 1; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(x, T); g.lineTo(x, h - B); g.stroke(); g.setLineDash([]);
+      if (v[hoverIdx] != null){ g.fillStyle = ink; g.beginPath(); g.arc(x, Y(v[hoverIdx]), 3.5, 0, Math.PI * 2); g.fill(); }
+      // time label riding on the crosshair: elapsed m:ss · clock time with seconds
+      const lab = `${fmtElapsed(t[hoverIdx] - t[0])} · ${fmtClock(t[hoverIdx])}${v[hoverIdx] != null ? "  ·  " + Number(v[hoverIdx]).toFixed(c.d) + " " + c.unit : ""}`;
+      g.font = "600 11px ui-monospace, SF Mono, monospace";
+      const tw = g.measureText(lab).width + 12, bx = Math.min(Math.max(L, x - tw / 2), w - R - tw);
+      g.fillStyle = ink; g.beginPath(); g.roundRect ? g.roundRect(bx, T, tw, 18, 5) : g.rect(bx, T, tw, 18); g.fill();
+      g.fillStyle = cssv("--bg"); g.fillText(lab, bx + 6, T + 13);
+      rd.textContent = v[hoverIdx] == null ? "—" : `${Number(v[hoverIdx]).toFixed(c.d)} ${c.unit}`;
+    } else rd.textContent = `max ${Math.max(...vals).toFixed(c.d)} ${c.unit}`;
+  }
+  $("chartTime").textContent = hoverIdx != null ? `${fmtElapsed(t[hoverIdx] - t[0])} into the trip (minutes:seconds) · clock time ${fmtClock(t[hoverIdx])}` : "Hover over a chart to see the exact second.";
+}
+
+// ------------------------------------------------------------------ fill-up calibration
+let fillInput = "";
+function renderFill(f){
+  const box = $("fillBox");
+  if (!f) return;
+  if (document.activeElement && document.activeElement.id === "fillLitres") return;   // don't redraw while typing
+  const key = JSON.stringify([f.since, f.km, f.est_l, f.last && f.last.at, Math.floor(Date.now() / 60000)]);
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  const last = f.last;
+  const lastHtml = last ? `<div class="list" style="margin-top:14px">
+      <div class="li"><span class="name">Last fill-up</span><span class="sub">${new Date(last.at * 1000).toLocaleDateString()}</span></div>
+      <div class="li"><span class="name">Pump said</span><span class="mono">${last.pumped_l} L</span></div>
+      <div class="li"><span class="name">Dashboard had estimated</span><span class="mono">${last.estimated_l} L</span></div>
+      <div class="li"><span class="name">Real mileage over ${last.km} km</span><span class="mono"><b>${last.real_kmpl ?? "—"} km/L</b></span></div>
+      <div class="li"><span class="name">Correction applied</span><span class="mono">estimate was ${Math.round(Math.abs(1 - last.factor) * 100)}% ${last.factor < 1 ? "high" : "low"}, now fixed</span></div></div>` : "";
+  if (!f.since){
+    box.innerHTML = `<div class="list">
+      <div class="li"><div><div class="name">Step 1</div><div class="sub">At the pump, fill the tank until it clicks off, then press this.</div></div><button class="btn primary" id="fillStart">Tank is full now</button></div>
+      <div class="li"><div><div class="name">Step 2</div><div class="sub">Drive normally for a few days with the dashboard running.</div></div></div>
+      <div class="li"><div><div class="name">Step 3</div><div class="sub">Fill to full again and enter the litres the pump shows.</div></div></div></div>${lastHtml}`;
+    $("fillStart").onclick = async () => { await fetch("/api/fill/start", {method:"POST"}); };
+    return;
+  }
+  box.innerHTML = `<div class="list">
+    <div class="li"><span class="name">Tank filled to full</span><span class="sub">${ago(f.since)}</span></div>
+    <div class="li"><span class="name">Driven since (while the dashboard was running)</span><span class="mono">${f.km} km</span></div>
+    <div class="li"><span class="name">Dashboard's fuel estimate since</span><span class="mono">${f.est_l} L</span></div>
+    <div class="li"><div><div class="name">At your next fill-up</div><div class="sub">Fill to full again, then type the litres from the pump.</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><input class="search" id="fillLitres" type="number" step="0.01" min="0" placeholder="Litres" style="width:110px" value="${esc(fillInput)}"><button class="btn primary" id="fillDone">Calibrate</button></div></div>
+    <div class="li"><span class="sub" id="fillMsg">Tip: only drive with the dashboard running between fill-ups, or the comparison is off.</span><button class="btn" id="fillRestart">Restart from full tank</button></div></div>${lastHtml}`;
+  $("fillLitres").oninput = (e) => fillInput = e.target.value;
+  $("fillDone").onclick = async () => {
+    const l = parseFloat($("fillLitres").value);
+    if (!(l > 0)){ $("fillMsg").textContent = "Enter the litres shown on the pump."; return; }
+    const r = await (await fetch("/api/fill/done?litres=" + encodeURIComponent(l), {method:"POST"})).json();
+    if (!r.ok){ $("fillMsg").textContent = r.why; return; }
+    fillInput = "";
+  };
+  $("fillRestart").onclick = async () => { if (confirm("Start counting again from a full tank now?")) await fetch("/api/fill/start", {method:"POST"}); };
+}
+
+// ------------------------------------------------------------------ under the hood
+let activeSub = "readings";
+document.querySelectorAll("#subnav button").forEach(b => b.onclick = () => {
+  activeSub = b.dataset.sub;
+  document.querySelectorAll("#subnav button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".sub-pane").forEach(p => p.classList.toggle("on", p.id === "sub-" + activeSub));
+  if (activeSub === "raw" && !$("console").childElementCount && rawRows.length) appendRaw(rawRows, true);
+  if (S) render(S);
+});
+function renderHood(s){
+  if (activeSub === "readings"){
+    $("allTbl").innerHTML = `<tr><th>Reading</th><th>Car's own name</th><th style="text-align:right">Now</th><th style="text-align:right">Low</th><th style="text-align:right">High</th><th>Unit</th><th>OBD code</th></tr>` + s.live.slice().sort((a, b) => (a.group || "").localeCompare(b.group || "") || a.name.localeCompare(b.name)).map(r => {
+      const code = r.tag ? r.tag : r.mode ? `${String(r.mode).padStart(2,"0")} ${r.pid != null ? r.pid.toString(16).toUpperCase().padStart(2,"0") : ""}` : "AT RV";
+      return `<tr><td>${esc(labelOf(r))}</td><td class="hint">${esc(r.desc)}</td><td class="mono" style="text-align:right">${r.value == null ? "—" : +r.value.toFixed(4)}</td><td class="mono" style="text-align:right">${r.min == null ? "" : +r.min.toFixed(4)}</td><td class="mono" style="text-align:right">${r.max == null ? "" : +r.max.toFixed(4)}</td><td>${esc(r.unit)}</td><td class="mono">${esc(code)} <span class="hint">${esc(r.name)}</span></td></tr>`;
+    }).join("");
+    const m = s.mode06 || [];
+    $("m06Tbl").innerHTML = `<tr><th>Test</th><th>Measurement</th><th style="text-align:right">Value</th><th style="text-align:right">Min</th><th style="text-align:right">Max</th><th>Result</th></tr>` + m.map(mon => mon.tests.map((t, i) => `<tr><td>${i ? "" : esc(MON[mon.monitor] || mon.monitor)}</td><td>${esc(t.desc)}</td><td class="mono" style="text-align:right">${t.value} ${esc(t.unit)}</td><td class="mono" style="text-align:right">${t.min}</td><td class="mono" style="text-align:right">${t.max}</td><td>${t.passed ? "Pass" : "<b>Fail</b>"}</td></tr>`).join("")).join("");
+  }
+  if (activeSub === "computers"){
+    const m = s.modules || {}, mods = m.list || [], present = mods.filter(x => x.present);
+    $("modBtn").disabled = m.running || s.conn.status !== "connected";
+    $("modStatus").textContent = m.running ? `Scanning ${m.progress ? m.progress.address : ""}…` : m.updated ? `${present.length} of ${mods.length} addresses answered · scanned ${ago(m.updated)}. Only read requests are sent.` : "";
+    $("modTech").innerHTML = present.map(x => `<div class="card panel" style="margin-top:12px"><h3>${esc((MODNAME[x.address] || [x.name])[0])} <span class="sub mono">asks ${esc(x.address)} · replies ${esc(x.reply)} · fault list: ${esc(x.dtc_method || "not available")}</span></h3>
+      ${x.ident.length ? `<div class="kv" style="margin-bottom:10px">${x.ident.map(i => `<div>${esc(i.label)} <span class="mono hint">${esc(i.req)}</span></div><div class="mono">${esc(i.value)}</div>`).join("")}</div>` : `<div class="hint" style="margin-bottom:8px">Answers, but doesn't share identification without a dealer tool.</div>`}
+      ${x.reads.length ? `<div class="scroll"><table><tr><th>Request</th><th>Decoded</th><th>Bytes</th></tr>${x.reads.map(r => `<tr><td class="mono">${esc(r.req)}</td><td>${r.values.map(v => `${esc(v.name.replace(/_/g, " "))}: ${v.value} ${esc(v.unit)}`).join("<br>") || '<span class="hint">not decoded yet</span>'}</td><td class="mono" style="word-break:break-all">${esc(r.hex)}</td></tr>`).join("")}</table></div>` : ""}</div>`).join("") + (mods.filter(x => !x.present).length ? `<div class="card panel" style="margin-top:12px"><h3>No answer</h3><div class="hint">${mods.filter(x => !x.present).map(x => `${esc(x.address)} ${esc(x.name)}`).join(" · ")}</div></div>` : "");
+  }
+  if (activeSub === "math"){
+    const re = s.re || {}, f = re.fields || [];
+    $("reFields").innerHTML = f.length ? `<tr><th>Block</th><th>Byte</th><th>Type</th><th>Matches</th><th style="text-align:right">r</th><th>Formula</th><th style="text-align:right">Samples</th></tr>` + f.map(x => `<tr><td class="mono">${esc(x.hdr)} ${esc(x.req.slice(0,2))} ${esc(x.req.slice(2))}</td><td class="mono">${x.offset}</td><td class="mono">${esc(x.type)}</td><td>${esc(REF[x.ref] || x.ref)}</td><td class="mono" style="text-align:right">${x.r.toFixed(3)}</td><td class="mono">raw × ${x.scale.toPrecision(4)} ${x.bias >= 0 ? "+" : "−"} ${Math.abs(x.bias).toPrecision(4)}</td><td class="mono" style="text-align:right">${x.n}</td></tr>`).join("") : `<tr><td class="empty">Nothing cracked yet. Press Start trip, then rev or drive.</td></tr>`;
+    $("reRaw").innerHTML = `<tr><th>Block</th><th>Samples</th><th>Latest bytes</th></tr>` + (re.blocks || []).map(b => `<tr><td class="mono">${esc(b.hdr)} ${esc(b.req)}</td><td class="mono">${b.n}</td><td class="mono" style="word-break:break-all">${b.bytes.map(y => y.class === "constant" ? `<span class="hint">${y.hex}</span>` : `<b>${y.hex}</b>`).join(" ")}</td></tr>`).join("");
+  }
+  if (activeSub === "bus") renderBus(s.sniff);
+  if (activeSub === "supported") renderSupported(s.supported || []);
+}
+
+// ------------------------------------------------------------------ connection
+function renderConn(c){
+  const ok = c.status === "connected";
+  $("dot").className = "dot" + (ok ? " on" : " pulse");
+  const parked = c.status === "parked";
+  $("connText").textContent = c.demo ? "Demo data" : c.replay ? "Replay · recorded drive" : ok ? (c.focus_until ? "Live · decoding" : "Live") : parked ? `Parked${c.voltage ? " · " + Number(c.voltage).toFixed(1) + " V" : ""}` : c.status === "waiting for bluetooth" ? "Connecting to adapter…" : c.status === "starting" ? "Starting…" : "Reconnecting…";
+  $("connMeta").textContent = ok ? [c.protocol, c.elm_version, c.pids_per_sec ? c.pids_per_sec + " values/s" : null, c.cycle_ms ? c.cycle_ms + " ms/cycle" : null, c.bridge ? "BT gen " + c.bridge.link_generation : null].filter(Boolean).join(" · ") : (c.error || "");
+  let title = "", text = "";
+  if (parked){
+    title = "Car is off.";
+    text = /not reachable/.test(c.parked_note || "") ? "The adapter isn't reachable (unplugged, or its socket has no power). Waiting for it to come back."
+      : "Waiting for the engine to start. Only the battery voltage is checked every 15 seconds, so the car's computers can sleep. The dashboard reconnects by itself when you start the engine.";
+  } else if (!ok && c.status !== "starting"){
+    title = "Not connected.";
+    text = /ignition/i.test(c.error || "") ? "Turn the key to ON or start the engine." : /not running/i.test(c.error || "") ? "Start the Bluetooth bridge (OBD Bridge.app)." : "Reconnecting to the car automatically. Make sure the adapter is plugged in and the ignition is on.";
+  }
+  $("banner").classList.toggle("show", !!title); $("bannerTitle").textContent = title; $("bannerText").textContent = text;
+  $("wakeBtn").hidden = !parked;
+  $("footTech").textContent = c.csv ? "Logging to " + c.csv : "";
+}
+let carsLoaded = false;
+async function loadCars(){
+  try {
+    const list = await (await fetch("/api/cars")).json();
+    $("carSel").innerHTML = list.map(c => `<option value="${esc(c.id)}" ${c.active ? "selected" : ""}>${esc([c.short || c.name, c.year].filter(Boolean).join(" · "))}</option>`).join("");
+    carsLoaded = true;
+  } catch(e){}
+}
+$("carSel").onchange = async () => {
+  $("carSel").disabled = true;
+  await fetch("/api/car?id=" + encodeURIComponent($("carSel").value), {method:"POST"});
+  setTimeout(() => location.reload(), 1200);
+};
+let lastCarId = null;
+function renderBrand(s){
+  const p = (s.vehicle && s.vehicle.profile) || {};
+  if (p.id && lastCarId && p.id !== lastCarId){ location.reload(); return; }      // car changed (auto-detected)
+  if (p.id){ lastCarId = p.id; if ($("carSel").value !== p.id && carsLoaded) $("carSel").value = p.id; }
+  $("logoHyundai").toggleAttribute("hidden", p.logo !== "hyundai"); $("logoSuzuki").toggleAttribute("hidden", p.logo !== "suzuki");
+  document.querySelectorAll(".mk").forEach(e => e.textContent = p.make || "Maker");
+  document.querySelectorAll(".car").forEach(e => e.textContent = p.short || "car");
+  if (p.name){ $("carName").textContent = p.name + " Live"; document.title = p.name + " Live"; $("carSub").textContent = [p.variant, p.year].filter(Boolean).join(" · ") + " · live from the car's computers"; }
+}
+
+// ------------------------------------------------------------------ main loop
+function selectTab(t){
+  activeTab = t;
+  if (t === "history") loadTrips(false);
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === t));
+  document.querySelectorAll("section.pane").forEach(p => p.classList.toggle("on", p.id === "pane-" + t));
+  if (S) render(S);
+}
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => selectTab(b.dataset.tab));
+function ingest(s){
+  for (const r of s.live){
+    if (r.value == null || r.t == null || lastT[r.name] === r.t) continue;
+    lastT[r.name] = r.t;
+    const a = H[r.name] || (H[r.name] = []); a.push([r.t, r.value]); if (a.length > MAXH) a.splice(0, a.length - MAXH);
+  }
+}
+let raf = 0;
+function render(s){
+  if (raf) return;
+  raf = requestAnimationFrame(() => {
+    raf = 0;
+    const live = {}; s.live.forEach(r => live[r.name] = r);
+    renderBrand(s); renderConn(s.conn); renderHero(live); renderTripBtn(s.trip);
+    $("ctLive").textContent = s.live.length || "";
+    if (activeTab === "live"){ renderCyls($("cylsHome"), s); renderLive(s.live, s.derived || [], s.info || {}); }
+    if (activeTab === "trip"){ renderTrip(s.trip); renderFill(s.trip && s.trip.fill); }
+    if (activeTab === "health"){ renderHealth(s); renderCyls($("cyls"), s); } else { const d = s.dtcs || {}; const n = (d.stored||[]).length + (d.pending||[]).length + (d.permanent||[]).length; $("ctHealth").textContent = n || ""; }
+    if (activeTab === "car") renderCar(s);
+    if (activeTab === "decode"){ renderDecode(s); renderWatch(s.watch); } else $("ctDecode").textContent = (((s.re && s.re.fields) || []).filter(x => x.primary).length + ((s.re && s.re.groups) || []).length) || "";
+    if (activeTab === "hood") renderHood(s);
+  });
+}
+function redrawAll(){ drawTripCharts(); if (!S) return; for (const n in cards) spark(cards[n].canvas, H[n]); render(S); }
+window.addEventListener("resize", redrawAll);
+document.querySelectorAll(".i:empty").forEach(b => { b.textContent = "i"; b.setAttribute("aria-label", "What is this?"); });
+window.__errors = []; window.addEventListener("error", e => window.__errors.push(String(e.message)));
+async function start(){
+  try {
+    const s = await (await fetch("/api/state?history=1")).json();
+    for (const [k, pts] of Object.entries(s.history || {})){ H[k] = pts.slice(-MAXH); if (pts.length) lastT[k] = pts[pts.length-1][0]; }
+    S = s; render(s);
+  } catch(e){}
+  const es = new EventSource("/api/stream");
+  es.onmessage = (ev) => { const s = JSON.parse(ev.data); ingest(s); S = s; render(s); };
+  es.onerror = () => renderConn({status:"reconnecting", error:"Lost contact with the dashboard program."});
+  pollRaw();
+  loadTrips(false);
+  loadCars();
+  // deep links: #tab=health, #tab=hood&sub=computers
+  const hp = new URLSearchParams(location.hash.slice(1));
+  if (hp.get("tab")) selectTab(hp.get("tab"));
+  if (hp.get("sub")){ const b = document.querySelector(`#subnav button[data-sub="${hp.get("sub")}"]`); if (b) b.click(); }
+  if (hp.get("scroll") === "tabs") setTimeout(() => { $("tabs").scrollIntoView(); window.scrollBy(0, -70); }, 1200);
+}
+start();
+</script>
+</body>
+</html>

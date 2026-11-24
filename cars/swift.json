@@ -1,0 +1,20 @@
+{
+ "id": "swift",
+ "make": "Suzuki",
+ "short": "Swift",
+ "logo": "suzuki",
+ "name": "Maruti Suzuki Swift",
+ "variant": "1.2 Petrol",
+ "year": 2010,
+ "engine": "K12M 1.2 · 1,197 cc · 4 cylinders · 85 PS",
+ "battery": "Not recorded",
+ "fuel_tank": "42 litres",
+ "displacement_l": 1.197,
+ "volumetric_efficiency": 0.85,
+ "fuel_price": 103.0,
+ "currency": "₹",
+ "match": {
+  "cal_prefix": "33920"
+ },
+ "source": "Maruti spec sheet; calibration number 33920-75J2 read from the engine computer"
+}

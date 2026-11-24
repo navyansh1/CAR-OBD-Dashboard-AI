@@ -1,0 +1,749 @@
+{
+ "source": "github.com/gdincu/HyundaiElantraCN7_OBD2_PIDs (CN7.csv, Torque format)",
+ "pids": [
+  {
+   "name": "ABS_Brake_Pressure",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "INT16(AG:AH)/86.7",
+   "eq_src": "INT16(AG:AH)/86.7",
+   "unit": "%"
+  },
+  {
+   "name": "ABS_Speed",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "G",
+   "eq_src": "G",
+   "unit": "Km/h"
+  },
+  {
+   "name": "ABS_Speed_Front_Left",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "L",
+   "eq_src": "L",
+   "unit": "Km/h"
+  },
+  {
+   "name": "ABS_Speed_Front_Right",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "M",
+   "eq_src": "M",
+   "unit": "Km/h"
+  },
+  {
+   "name": "ABS_Speed_Rear_Left",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "O",
+   "eq_src": "O",
+   "unit": "Km/h"
+  },
+  {
+   "name": "ABS_Speed_Rear_Right",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "N",
+   "eq_src": "N",
+   "unit": "Km/h"
+  },
+  {
+   "name": "ABS_Steering_Wheel",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "(SIGNED(Z)*256+AA)/-45",
+   "eq_src": "(SIGNED(Z)*256+AA)/-45",
+   "unit": "%"
+  },
+  {
+   "name": "ABS_Steering_Wheel_Deg",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "(SIGNED(Z)*256+AA)/-10",
+   "eq_src": "(SIGNED(Z)*256+AA)/-10",
+   "unit": "deg"
+  },
+  {
+   "name": "ABS_Traction_Control_Switch",
+   "header": "7D1",
+   "request": "220104",
+   "eq": "1-BIT(S:6)",
+   "eq_src": "1-BIT(S:6)",
+   "unit": ""
+  },
+  {
+   "name": "BMS_Auxillary_Battery_Current",
+   "header": "7E0",
+   "request": "22E004",
+   "eq": "(X+SIGNED(Y)*256)*0.001",
+   "eq_src": "(X+SIGNED(Y)*256)*0.001",
+   "unit": "A"
+  },
+  {
+   "name": "BMS_Auxillary_Battery_State_Of_Charge",
+   "header": "7E0",
+   "request": "22E004",
+   "eq": "AD",
+   "eq_src": "AD",
+   "unit": "%"
+  },
+  {
+   "name": "BMS_Auxillary_Battery_State_Of_Health",
+   "header": "7E0",
+   "request": "22E004",
+   "eq": "AE",
+   "eq_src": "AE",
+   "unit": "%"
+  },
+  {
+   "name": "BMS_Auxillary_Battery_Temperature",
+   "header": "7E0",
+   "request": "22E004",
+   "eq": "(AC*256+AB)*0.500008-40",
+   "eq_src": "(AC*256+AB)*0.500008-40",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_Auxillary_Battery_Voltage",
+   "header": "7E0",
+   "request": "22E004",
+   "eq": "(AA*256+Z)*0.001+6",
+   "eq_src": "(AA*256+Z)*0.001+6",
+   "unit": "V"
+  },
+  {
+   "name": "BMS_Available_Charge_Power",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "((F<8)+G)/100",
+   "eq_src": "((F<8)+G)/100",
+   "unit": "kW"
+  },
+  {
+   "name": "BMS_Available_Discharge_Power",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "((H<8)+I)/100",
+   "eq_src": "((H<8)+I)/100",
+   "unit": "kW"
+  },
+  {
+   "name": "BMS_Battery_Min_Temperature",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "SIGNED(P)",
+   "eq_src": "SIGNED(P)",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_Battery_Module_01_Temperature",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "SIGNED(Q)",
+   "eq_src": "SIGNED(Q)",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_Battery_Module_02_Temperature",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "SIGNED(R)",
+   "eq_src": "SIGNED(R)",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_Battery_Module_03_Temperature",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "SIGNED(S)",
+   "eq_src": "SIGNED(S)",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_Battery_Module_04_Temperature",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "SIGNED(T)",
+   "eq_src": "SIGNED(T)",
+   "unit": "C"
+  },
+  {
+   "name": "BMS_State_Of_Charge",
+   "header": "7D4",
+   "request": "220101",
+   "eq": "E/2",
+   "eq_src": "E/2",
+   "unit": "%"
+  },
+  {
+   "name": "Cluster_Fuel_Level",
+   "header": "7C6",
+   "request": "22B002",
+   "eq": "(E*1.09890109890109890)",
+   "eq_src": "TAVG(120:EWMAF(0.01:(E*1.09890109890109890)))",
+   "unit": "%"
+  },
+  {
+   "name": "Cluster_Fuel_Volume",
+   "header": "7C6",
+   "request": "22B002",
+   "eq": "E*0.5",
+   "eq_src": "E*0.5",
+   "unit": "L"
+  },
+  {
+   "name": "Cluster_Odometer_CalcMethod1",
+   "header": "7C6",
+   "request": "22B002",
+   "eq": "INT24(G:H:I)",
+   "eq_src": "INT24(G:H:I)",
+   "unit": "km"
+  },
+  {
+   "name": "Cluster_Odometer_CalcMethod2",
+   "header": "7C6",
+   "request": "22B002",
+   "eq": "(H<8)+I",
+   "eq_src": "(H<8)+I",
+   "unit": "Km"
+  },
+  {
+   "name": "Cluster_Voltage",
+   "header": "7C6",
+   "request": "22B002",
+   "eq": "F*0.078125",
+   "eq_src": "F*0.078125",
+   "unit": "V"
+  },
+  {
+   "name": "ECM_Baro_Direct",
+   "header": "7E0",
+   "request": "22E003",
+   "eq": "F*0.5019608",
+   "eq_src": "F*0.5019608",
+   "unit": "kPa"
+  },
+  {
+   "name": "ECM_Battery_Voltage",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "E*0.068235",
+   "eq_src": "E*0.068235",
+   "unit": "V"
+  },
+  {
+   "name": "ECM_Coolant_Temp",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "Z*0.75-48",
+   "eq_src": "Z*0.75-48",
+   "unit": "C"
+  },
+  {
+   "name": "ECM_Engine_Load",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "(N+O*256)*0.023438",
+   "eq_src": "(N+O*256)*0.023438",
+   "unit": "%"
+  },
+  {
+   "name": "ECM_Knocking_Control_Retard_Cylinder1",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(M)/5",
+   "eq_src": "SIGNED(M)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Control_Retard_Cylinder2",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(N)/5",
+   "eq_src": "SIGNED(N)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Control_Retard_Cylinder3",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(O)/5",
+   "eq_src": "SIGNED(O)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Control_Retard_Cylinder4",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(P)/5",
+   "eq_src": "SIGNED(P)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Learning_Value_Cylinder1",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(U)/5",
+   "eq_src": "SIGNED(U)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Learning_Value_Cylinder2",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(V)/5",
+   "eq_src": "SIGNED(V)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Learning_Value_Cylinder3",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(W)/5",
+   "eq_src": "SIGNED(W)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_Knocking_Learning_Value_Cylinder4",
+   "header": "7E0",
+   "request": "22E00A",
+   "eq": "SIGNED(X)/5",
+   "eq_src": "SIGNED(X)/5",
+   "unit": "deg"
+  },
+  {
+   "name": "ECM_MAP_Direct",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "(Q+R*256)*0.003906",
+   "eq_src": "(Q+R*256)*0.003906",
+   "unit": "kPa"
+  },
+  {
+   "name": "ECM_RPM_Direct",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "(H+I*256)*0.250004",
+   "eq_src": "(H+I*256)*0.250004",
+   "unit": "RPM"
+  },
+  {
+   "name": "ECM_Vehicle_Speed_Direct",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "M*1.250196",
+   "eq_src": "M*1.250196",
+   "unit": "km/h"
+  },
+  {
+   "name": "EMS_Intake_Temperature",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "AH*0.75-48",
+   "eq_src": "AH*0.75-48",
+   "unit": "C"
+  },
+  {
+   "name": "EMS_Oil_Temperature",
+   "header": "7E0",
+   "request": "22E001",
+   "eq": "AI*0.75-48",
+   "eq_src": "AI*0.75-48",
+   "unit": "C"
+  },
+  {
+   "name": "IGMP_Belt_BL",
+   "header": "770",
+   "request": "22BC04",
+   "eq": "((G&4)>2)",
+   "eq_src": "((G&4)>2)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Belt_BM",
+   "header": "770",
+   "request": "22BC04",
+   "eq": "((G&8)>3)",
+   "eq_src": "((G&8)>3)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Belt_BR",
+   "header": "770",
+   "request": "22BC04",
+   "eq": "(G&2)>1",
+   "eq_src": "(G&2)>1",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Belt_Driver",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((F&2)>1)",
+   "eq_src": "((F&2)>1)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Belt_Passenger",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((F&4)>2)",
+   "eq_src": "((F&4)>2)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Bonnet",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "F&1",
+   "eq_src": "F&1",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Brake_Pedal_Switch",
+   "header": "770",
+   "request": "22BC06",
+   "eq": "E/45",
+   "eq_src": "E/45",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_DeFog_Lights",
+   "header": "770",
+   "request": "22BC07",
+   "eq": "F",
+   "eq_src": "F",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_DeFog_Switch",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "H>1",
+   "eq_src": "H>1",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_FL_Door_Lock",
+   "header": "770",
+   "request": "22BC04",
+   "eq": null,
+   "eq_src": "LOOKUP(((E&8)>3):'U':0='L')",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_FL_Door_Open",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((E&32)>5)",
+   "eq_src": "((E&32)>5)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_FR_Door_Lock",
+   "header": "770",
+   "request": "22BC04",
+   "eq": null,
+   "eq_src": "LOOKUP(((E&4)>2):'U':0='L')",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_FR_Door_Open",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((E&16)>4)",
+   "eq_src": "((E&16)>4)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Handbrake_Switch",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "E>6",
+   "eq_src": "E>6",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Hazard_Lights_Switch",
+   "header": "770",
+   "request": "22BC05",
+   "eq": null,
+   "eq_src": "LOOKUP(AVG(3:E):0:80=1:160=1)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Headlights_High_Beam",
+   "header": "770",
+   "request": "22BC09",
+   "eq": "G/12",
+   "eq_src": "G/12",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Headlights_Low_Beam",
+   "header": "770",
+   "request": "22BC09",
+   "eq": "H/12",
+   "eq_src": "H/12",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Headlights_Switch",
+   "header": "770",
+   "request": "22BC05",
+   "eq": "G>2",
+   "eq_src": "G>2",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_On",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "F&96",
+   "eq_src": "F&96",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_RL_Door_Open",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "E&1",
+   "eq_src": "E&1",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_RR_Door_Open",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((E&4)>2)",
+   "eq_src": "((E&4)>2)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Reverse",
+   "header": "770",
+   "request": "22BC04",
+   "eq": null,
+   "eq_src": "LOOKUP(E/15:0:1=1)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Trunk_Door_Open",
+   "header": "770",
+   "request": "22BC03",
+   "eq": "((E&128)>7)",
+   "eq_src": "((E&128)>7)",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Turn_Signal_Left",
+   "header": "770",
+   "request": "22BC08",
+   "eq": "E>1",
+   "eq_src": "E>1",
+   "unit": ""
+  },
+  {
+   "name": "IGMP_Turn_Signal_Right",
+   "header": "770",
+   "request": "22BC08",
+   "eq": "E>3",
+   "eq_src": "E>3",
+   "unit": ""
+  },
+  {
+   "name": "Injection_OpenDuration_Inj_1",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "INT16(X:W)*0.8192",
+   "eq_src": "INT16(X:W)*0.8192",
+   "unit": "mS"
+  },
+  {
+   "name": "Injection_OpenDuration_Inj_2",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "INT16(Z:Y)*0.8192",
+   "eq_src": "INT16(Z:Y)*0.8192",
+   "unit": "mS"
+  },
+  {
+   "name": "Injection_OpenDuration_Inj_3",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "INT16(AB:AA)*0.8192",
+   "eq_src": "INT16(AB:AA)*0.8192",
+   "unit": "mS"
+  },
+  {
+   "name": "Injection_OpenDuration_Inj_4",
+   "header": "7E0",
+   "request": "22E002",
+   "eq": "INT16(AD:AC)*0.8192",
+   "eq_src": "INT16(AD:AC)*0.8192",
+   "unit": "mS"
+  },
+  {
+   "name": "TPMS_Alert_FL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "H",
+   "eq_src": "H",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Alert_FR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "M",
+   "eq_src": "M",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Alert_RL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "W",
+   "eq_src": "W",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Alert_RR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "R",
+   "eq_src": "R",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Battery_FL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": null,
+   "eq_src": "LOOKUP(G::0='>3 V':1='2.7 - 3 V':2='2.4 - 2.7 V':3='< 2.4 V')",
+   "unit": "%"
+  },
+  {
+   "name": "TPMS_Battery_FR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": null,
+   "eq_src": "LOOKUP(L::0='>3 V':1='2.7 - 3 V':2='2.4 - 2.7 V':3='< 2.4 V')",
+   "unit": "%"
+  },
+  {
+   "name": "TPMS_Battery_RL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": null,
+   "eq_src": "LOOKUP(V::0='>3 V':1='2.7 - 3 V':2='2.4 - 2.7 V':3='< 2.4 V')",
+   "unit": "%"
+  },
+  {
+   "name": "TPMS_Battery_RR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": null,
+   "eq_src": "LOOKUP(Q::0='>3 V':1='2.7 - 3 V':2='2.4 - 2.7 V':3='< 2.4 V')",
+   "unit": "%"
+  },
+  {
+   "name": "TPMS_Invalid_FL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "BIT(H:6)",
+   "eq_src": "BIT(H:6)",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Invalid_FR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "BIT(L:6)",
+   "eq_src": "BIT(L:6)",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Invalid_RL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "BIT(P:6)",
+   "eq_src": "BIT(P:6)",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Invalid_RR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "BIT(T:6)",
+   "eq_src": "BIT(T:6)",
+   "unit": ""
+  },
+  {
+   "name": "TPMS_Tyre_Pressure_FL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "E/5",
+   "eq_src": "E/5",
+   "unit": "psi"
+  },
+  {
+   "name": "TPMS_Tyre_Pressure_FR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "J/5",
+   "eq_src": "J/5",
+   "unit": "psi"
+  },
+  {
+   "name": "TPMS_Tyre_Pressure_RL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "T/5",
+   "eq_src": "T/5",
+   "unit": "psi"
+  },
+  {
+   "name": "TPMS_Tyre_Pressure_RR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "O/5",
+   "eq_src": "O/5",
+   "unit": "psi"
+  },
+  {
+   "name": "TPMS_Tyre_Temperature_FL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "F-50",
+   "eq_src": "F-50",
+   "unit": "C"
+  },
+  {
+   "name": "TPMS_Tyre_Temperature_FR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "K-50",
+   "eq_src": "K-50",
+   "unit": "C"
+  },
+  {
+   "name": "TPMS_Tyre_Temperature_RL",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "U-50",
+   "eq_src": "U-50",
+   "unit": "C"
+  },
+  {
+   "name": "TPMS_Tyre_Temperature_RR",
+   "header": "7A0",
+   "request": "22C00B",
+   "eq": "P-50",
+   "eq_src": "P-50",
+   "unit": "C"
+  }
+ ]
+}

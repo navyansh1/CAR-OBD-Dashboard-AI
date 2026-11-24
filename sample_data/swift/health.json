@@ -1,0 +1,453 @@
+{
+ "note": "Health snapshot from the 21 Nov 2026 session.",
+ "protocol": "ISO 15765-4 (CAN 11/500)",
+ "vehicle": {
+  "vin": null,
+  "calibration_ids": [
+   "33920-75J2*00000"
+  ],
+  "cvn": [],
+  "ecu_names": [],
+  "maker": null
+ },
+ "status": {
+  "mil": false,
+  "dtc_count": 0,
+  "ignition": "spark",
+  "tests": [
+   {
+    "name": "Misfire",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Fuel System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Component",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Oxygen Sensor",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Oxygen Sensor Heater",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Egr Vvt System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Boost Pressure",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Evaporative System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Exhaust Gas Sensor",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Heated Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nmhc Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nox Scr Aftertreatment",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Pm Filter",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Secondary Air System",
+    "available": false,
+    "complete": null
+   }
+  ]
+ },
+ "status_cycle": {
+  "mil": false,
+  "dtc_count": 0,
+  "ignition": "spark",
+  "tests": [
+   {
+    "name": "Misfire",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Fuel System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Component",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Oxygen Sensor",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Oxygen Sensor Heater",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Egr Vvt System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Boost Pressure",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Evaporative System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Exhaust Gas Sensor",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Heated Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nmhc Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nox Scr Aftertreatment",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Pm Filter",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Secondary Air System",
+    "available": false,
+    "complete": null
+   }
+  ]
+ },
+ "dtcs": {
+  "stored": [],
+  "pending": [],
+  "permanent": []
+ },
+ "info": {
+  "FUEL_STATUS": {
+   "desc": "Fuel System Status",
+   "value": "Closed loop, using oxygen sensor feedback to determine fuel mix"
+  },
+  "O2_SENSORS": {
+   "desc": "O2 Sensors Present",
+   "value": "Bank 1 sensor 1, Bank 1 sensor 2"
+  },
+  "OBD_COMPLIANCE": {
+   "desc": "OBD Standards Compliance",
+   "value": "EOBD (Europe)"
+  }
+ },
+ "mode06": [],
+ "supported": [
+  {
+   "mode": 1,
+   "pid": 4,
+   "name": "ENGINE_LOAD",
+   "desc": "Calculated Engine Load",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 5,
+   "name": "COOLANT_TEMP",
+   "desc": "Engine Coolant Temperature",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 6,
+   "name": "SHORT_FUEL_TRIM_1",
+   "desc": "Short Term Fuel Trim - Bank 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 7,
+   "name": "LONG_FUEL_TRIM_1",
+   "desc": "Long Term Fuel Trim - Bank 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 11,
+   "name": "INTAKE_PRESSURE",
+   "desc": "Intake Manifold Pressure",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 12,
+   "name": "RPM",
+   "desc": "Engine RPM",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 13,
+   "name": "SPEED",
+   "desc": "Vehicle Speed",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 14,
+   "name": "TIMING_ADVANCE",
+   "desc": "Timing Advance",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 15,
+   "name": "INTAKE_TEMP",
+   "desc": "Intake Air Temp",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 16,
+   "name": "MAF",
+   "desc": "Air Flow Rate (MAF)",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 17,
+   "name": "THROTTLE_POS",
+   "desc": "Throttle Position",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 21,
+   "name": "O2_B1S2",
+   "desc": "O2: Bank 1 - Sensor 2 Voltage",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 31,
+   "name": "RUN_TIME",
+   "desc": "Engine Run Time",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 33,
+   "name": "DISTANCE_W_MIL",
+   "desc": "Distance Traveled with MIL on",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 44,
+   "name": "COMMANDED_EGR",
+   "desc": "Commanded EGR",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 46,
+   "name": "EVAPORATIVE_PURGE",
+   "desc": "Commanded Evaporative Purge",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 48,
+   "name": "WARMUPS_SINCE_DTC_CLEAR",
+   "desc": "Number of warm-ups since codes cleared",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 49,
+   "name": "DISTANCE_SINCE_DTC_CLEAR",
+   "desc": "Distance traveled since codes cleared",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 51,
+   "name": "BAROMETRIC_PRESSURE",
+   "desc": "Barometric Pressure",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 52,
+   "name": "O2_S1_WR_CURRENT",
+   "desc": "02 Sensor 1 WR Lambda Current",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 66,
+   "name": "CONTROL_MODULE_VOLTAGE",
+   "desc": "Control module voltage",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 67,
+   "name": "ABSOLUTE_LOAD",
+   "desc": "Absolute load value",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 69,
+   "name": "RELATIVE_THROTTLE_POS",
+   "desc": "Relative throttle position",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 71,
+   "name": "THROTTLE_POS_B",
+   "desc": "Absolute throttle position B",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 73,
+   "name": "ACCELERATOR_POS_D",
+   "desc": "Accelerator pedal position D",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 74,
+   "name": "ACCELERATOR_POS_E",
+   "desc": "Accelerator pedal position E",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 76,
+   "name": "THROTTLE_ACTUATOR",
+   "desc": "Commanded throttle actuator",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 3,
+   "pid": null,
+   "name": "GET_DTC",
+   "desc": "Get DTCs",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 4,
+   "pid": null,
+   "name": "CLEAR_DTC",
+   "desc": "Clear DTCs and Freeze data",
+   "polled": false,
+   "note": "never sent (would clear codes)"
+  },
+  {
+   "mode": 7,
+   "pid": null,
+   "name": "GET_CURRENT_DTC",
+   "desc": "Get DTCs from the current/last driving cycle",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 9,
+   "pid": 4,
+   "name": "CALIBRATION_ID",
+   "desc": "Calibration ID",
+   "polled": true,
+   "note": ""
+  }
+ ],
+ "seed": {
+  "ELM_VOLTAGE": [
+   14.1,
+   "V"
+  ]
+ }
+}

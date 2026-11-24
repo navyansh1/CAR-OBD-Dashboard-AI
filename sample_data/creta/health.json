@@ -1,0 +1,773 @@
+{
+ "note": "Health snapshot from the 21 Nov 2026 session. Test values are as reported; pass limits marked (approx) are illustrative.",
+ "protocol": "ISO 15765-4 (CAN 11/500)",
+ "vehicle": {
+  "vin": "MALC281CLFM0•••••",
+  "calibration_ids": [
+   "GAGS-GI46FS00600"
+  ],
+  "cvn": [
+   "2CDCA6D5"
+  ],
+  "ecu_names": [
+   "ECM - EngineControl"
+  ],
+  "maker": "Hyundai (India)",
+  "model_year_candidates": [
+   2015
+  ]
+ },
+ "status": {
+  "mil": false,
+  "dtc_count": 0,
+  "ignition": "spark",
+  "tests": [
+   {
+    "name": "Misfire",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Fuel System",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Component",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Catalyst",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Oxygen Sensor",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Oxygen Sensor Heater",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Egr Vvt System",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Boost Pressure",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Evaporative System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Exhaust Gas Sensor",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Heated Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nmhc Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nox Scr Aftertreatment",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Pm Filter",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Secondary Air System",
+    "available": false,
+    "complete": null
+   }
+  ]
+ },
+ "status_cycle": {
+  "mil": false,
+  "dtc_count": 0,
+  "ignition": "spark",
+  "tests": [
+   {
+    "name": "Misfire",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Fuel System",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Component",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Catalyst",
+    "available": true,
+    "complete": false
+   },
+   {
+    "name": "Oxygen Sensor",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Oxygen Sensor Heater",
+    "available": true,
+    "complete": true
+   },
+   {
+    "name": "Egr Vvt System",
+    "available": true,
+    "complete": false
+   },
+   {
+    "name": "Boost Pressure",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Evaporative System",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Exhaust Gas Sensor",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Heated Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nmhc Catalyst",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Nox Scr Aftertreatment",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Pm Filter",
+    "available": false,
+    "complete": null
+   },
+   {
+    "name": "Secondary Air System",
+    "available": false,
+    "complete": null
+   }
+  ]
+ },
+ "dtcs": {
+  "stored": [],
+  "pending": [],
+  "permanent": []
+ },
+ "info": {
+  "FUEL_STATUS": {
+   "desc": "Fuel System Status",
+   "value": "Closed loop, using oxygen sensor feedback to determine fuel mix"
+  },
+  "O2_SENSORS": {
+   "desc": "O2 Sensors Present",
+   "value": "Bank 1 sensor 1, Bank 1 sensor 2"
+  },
+  "OBD_COMPLIANCE": {
+   "desc": "OBD Standards Compliance",
+   "value": "EOBD (Europe)"
+  }
+ },
+ "mode06": [
+  {
+   "monitor": "O2_B1S1",
+   "desc": "O2 Sensor Monitor Bank 1 - Sensor 1",
+   "tests": [
+    {
+     "tid": 1,
+     "name": null,
+     "desc": "Rich to lean sensor threshold voltage",
+     "value": 450.424,
+     "min": 450.424,
+     "max": 450.424,
+     "unit": "mV",
+     "passed": true
+    },
+    {
+     "tid": 2,
+     "name": null,
+     "desc": "Lean to rich sensor threshold voltage",
+     "value": 450.424,
+     "min": 450.424,
+     "max": 450.424,
+     "unit": "mV",
+     "passed": true
+    },
+    {
+     "tid": 10,
+     "name": null,
+     "desc": "Sensor period",
+     "value": 40.0,
+     "min": 0.0,
+     "max": 1750.0,
+     "unit": "ms",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "O2_B1S2",
+   "desc": "O2 Sensor Monitor Bank 1 - Sensor 2",
+   "tests": [
+    {
+     "tid": 1,
+     "name": null,
+     "desc": "Rich to lean sensor threshold voltage",
+     "value": 649.04,
+     "min": 649.04,
+     "max": 649.04,
+     "unit": "mV",
+     "passed": true
+    },
+    {
+     "tid": 2,
+     "name": null,
+     "desc": "Lean to rich sensor threshold voltage",
+     "value": 649.04,
+     "min": 649.04,
+     "max": 649.04,
+     "unit": "mV",
+     "passed": true
+    },
+    {
+     "tid": 129,
+     "name": null,
+     "desc": "Test 0x81",
+     "value": 60.0,
+     "min": 0.0,
+     "max": 1000.0,
+     "unit": "ms",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "CATALYST_B1",
+   "desc": "Catalyst Monitor Bank 1",
+   "tests": [
+    {
+     "tid": 129,
+     "name": null,
+     "desc": "Catalyst efficiency (approx limits)",
+     "value": 312.96,
+     "min": 0.0,
+     "max": 1000.0,
+     "unit": "%",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "VVT_B1",
+   "desc": "VVT Monitor Bank 1",
+   "tests": [
+    {
+     "tid": 129,
+     "name": null,
+     "desc": "Valve timing test 1 (approx limits)",
+     "value": 21.27,
+     "min": 0.0,
+     "max": 60.0,
+     "unit": "°",
+     "passed": true
+    },
+    {
+     "tid": 130,
+     "name": null,
+     "desc": "Valve timing test 2 (approx limits)",
+     "value": 21.27,
+     "min": 0.0,
+     "max": 60.0,
+     "unit": "°",
+     "passed": true
+    },
+    {
+     "tid": 131,
+     "name": null,
+     "desc": "Valve timing test 3 (approx limits)",
+     "value": 2.77,
+     "min": 0.0,
+     "max": 30.0,
+     "unit": "°",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "O2_HEATER_B1S1",
+   "desc": "O2 Sensor Heater Monitor Bank 1 - Sensor 1",
+   "tests": [
+    {
+     "tid": 129,
+     "name": null,
+     "desc": "Heater resistance (approx limits)",
+     "value": 156.0,
+     "min": 0.0,
+     "max": 500.0,
+     "unit": "Ω",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "O2_HEATER_B1S2",
+   "desc": "O2 Sensor Heater Monitor Bank 1 - Sensor 2",
+   "tests": [
+    {
+     "tid": 129,
+     "name": null,
+     "desc": "Heater resistance (approx limits)",
+     "value": 168.0,
+     "min": 0.0,
+     "max": 500.0,
+     "unit": "Ω",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "MISFIRE_CYLINDER_1",
+   "desc": "Misfire Cylinder 1 Data",
+   "tests": [
+    {
+     "tid": 11,
+     "name": null,
+     "desc": "Average misfire counts for last ten driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    },
+    {
+     "tid": 12,
+     "name": null,
+     "desc": "Misfire counts for last/current driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "MISFIRE_CYLINDER_2",
+   "desc": "Misfire Cylinder 2 Data",
+   "tests": [
+    {
+     "tid": 11,
+     "name": null,
+     "desc": "Average misfire counts for last ten driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    },
+    {
+     "tid": 12,
+     "name": null,
+     "desc": "Misfire counts for last/current driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "MISFIRE_CYLINDER_3",
+   "desc": "Misfire Cylinder 3 Data",
+   "tests": [
+    {
+     "tid": 11,
+     "name": null,
+     "desc": "Average misfire counts for last ten driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    },
+    {
+     "tid": 12,
+     "name": null,
+     "desc": "Misfire counts for last/current driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    }
+   ]
+  },
+  {
+   "monitor": "MISFIRE_CYLINDER_4",
+   "desc": "Misfire Cylinder 4 Data",
+   "tests": [
+    {
+     "tid": 11,
+     "name": null,
+     "desc": "Average misfire counts for last ten driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    },
+    {
+     "tid": 12,
+     "name": null,
+     "desc": "Misfire counts for last/current driving cycles",
+     "value": 0.0,
+     "min": 0.0,
+     "max": 65535.0,
+     "unit": "count",
+     "passed": true
+    }
+   ]
+  }
+ ],
+ "supported": [
+  {
+   "mode": 1,
+   "pid": 4,
+   "name": "ENGINE_LOAD",
+   "desc": "Calculated Engine Load",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 5,
+   "name": "COOLANT_TEMP",
+   "desc": "Engine Coolant Temperature",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 6,
+   "name": "SHORT_FUEL_TRIM_1",
+   "desc": "Short Term Fuel Trim - Bank 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 7,
+   "name": "LONG_FUEL_TRIM_1",
+   "desc": "Long Term Fuel Trim - Bank 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 11,
+   "name": "INTAKE_PRESSURE",
+   "desc": "Intake Manifold Pressure",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 12,
+   "name": "RPM",
+   "desc": "Engine RPM",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 13,
+   "name": "SPEED",
+   "desc": "Vehicle Speed",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 14,
+   "name": "TIMING_ADVANCE",
+   "desc": "Timing Advance",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 15,
+   "name": "INTAKE_TEMP",
+   "desc": "Intake Air Temp",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 17,
+   "name": "THROTTLE_POS",
+   "desc": "Throttle Position",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 20,
+   "name": "O2_B1S1",
+   "desc": "O2: Bank 1 - Sensor 1 Voltage",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 21,
+   "name": "O2_B1S2",
+   "desc": "O2: Bank 1 - Sensor 2 Voltage",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 31,
+   "name": "RUN_TIME",
+   "desc": "Engine Run Time",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 33,
+   "name": "DISTANCE_W_MIL",
+   "desc": "Distance Traveled with MIL on",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 46,
+   "name": "EVAPORATIVE_PURGE",
+   "desc": "Commanded Evaporative Purge",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 47,
+   "name": "FUEL_LEVEL",
+   "desc": "Fuel Level Input",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 48,
+   "name": "WARMUPS_SINCE_DTC_CLEAR",
+   "desc": "Number of warm-ups since codes cleared",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 49,
+   "name": "DISTANCE_SINCE_DTC_CLEAR",
+   "desc": "Distance traveled since codes cleared",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 51,
+   "name": "BAROMETRIC_PRESSURE",
+   "desc": "Barometric Pressure",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 60,
+   "name": "CATALYST_TEMP_B1S1",
+   "desc": "Catalyst Temperature: Bank 1 - Sensor 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 66,
+   "name": "CONTROL_MODULE_VOLTAGE",
+   "desc": "Control module voltage",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 67,
+   "name": "ABSOLUTE_LOAD",
+   "desc": "Absolute load value",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 68,
+   "name": "COMMANDED_EQUIV_RATIO",
+   "desc": "Commanded equivalence ratio",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 69,
+   "name": "RELATIVE_THROTTLE_POS",
+   "desc": "Relative throttle position",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 70,
+   "name": "AMBIANT_AIR_TEMP",
+   "desc": "Ambient air temperature",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 71,
+   "name": "THROTTLE_POS_B",
+   "desc": "Absolute throttle position B",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 73,
+   "name": "ACCELERATOR_POS_D",
+   "desc": "Accelerator pedal position D",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 74,
+   "name": "ACCELERATOR_POS_E",
+   "desc": "Accelerator pedal position E",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 76,
+   "name": "THROTTLE_ACTUATOR",
+   "desc": "Commanded throttle actuator",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 1,
+   "pid": 86,
+   "name": "LONG_O2_TRIM_B1",
+   "desc": "Long term secondary O2 trim - Bank 1",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 3,
+   "pid": null,
+   "name": "GET_DTC",
+   "desc": "Get DTCs",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 4,
+   "pid": null,
+   "name": "CLEAR_DTC",
+   "desc": "Clear DTCs and Freeze data",
+   "polled": false,
+   "note": "never sent (would clear codes)"
+  },
+  {
+   "mode": 7,
+   "pid": null,
+   "name": "GET_CURRENT_DTC",
+   "desc": "Get DTCs from the current/last driving cycle",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 9,
+   "pid": 2,
+   "name": "VIN",
+   "desc": "Vehicle Identification Number",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 9,
+   "pid": 4,
+   "name": "CALIBRATION_ID",
+   "desc": "Calibration ID",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 9,
+   "pid": 6,
+   "name": "CVN",
+   "desc": "Calibration Verification Numbers",
+   "polled": true,
+   "note": ""
+  },
+  {
+   "mode": 9,
+   "pid": 10,
+   "name": "ECU_NAME",
+   "desc": "ECU name",
+   "polled": true,
+   "note": ""
+  }
+ ],
+ "seed": {
+  "ELM_VOLTAGE": [
+   14.3,
+   "V"
+  ],
+  "COOLANT_TEMP": [
+   84.0,
+   "°C"
+  ]
+ }
+}
