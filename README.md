@@ -7,10 +7,7 @@
 Live gauges · health check · per-cylinder misfires · mileage and trip cost · past-trip replays ·
 and a reverse-engineering lab that cracks the manufacturer's **hidden** engine data.
 
-![macOS](https://img.shields.io/badge/macOS-Apple%20Silicon-000000?logo=apple)
-![Python](https://img.shields.io/badge/Python-3.11%2B-000000?logo=python&logoColor=white)
-![ELM327](https://img.shields.io/badge/adapter-ELM327%20Bluetooth-000000)
-![Read only](https://img.shields.io/badge/car%20access-read%20only-000000)
+**macOS (Apple Silicon)** · **Python 3.11+** · **any ELM327 Bluetooth adapter** · **read-only, never writes to the car**
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/hero-light.png">
