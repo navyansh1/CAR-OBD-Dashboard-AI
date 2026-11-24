@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAR OBD Dashboard AI: see everything your car knows</title>
+<meta name="description" content="Open-source live OBD-II dashboard for cheap ELM327 Bluetooth scanners on macOS: health check, per-cylinder misfires, mileage and trip cost, past trips, and a lab that decodes hidden manufacturer data. By Navyansh Kothari (navygeeks.in).">
+<meta property="og:title" content="CAR OBD Dashboard AI">
+<meta property="og:description" content="Plug a ₹500 Bluetooth OBD scanner into your car and see everything its computers know: live, in plain English, on your Mac.">
+<meta property="og:image" content="https://navyansh1.github.io/CAR-OBD-Dashboard-AI/screenshots/hero-dark.png">
+<meta property="og:url" content="https://navyansh1.github.io/CAR-OBD-Dashboard-AI/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Navyansh Kothari">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111'/%3E%3Cpath d='M7 21a9 9 0 1 1 18 0' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3Cpath d='M16 21l5-6' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f3f3f3; --surface:#ffffff; --surface-2:#f8f8f8; --ink:#101010; --ink-2:#3a3a3a; --muted:#6c6c6c; --faint:#a3a3a3;
+  --line:#e2e2e2; --line-2:#cdcdcd; --fill:rgba(0,0,0,.05); --shadow:0 30px 80px rgba(0,0,0,.12);
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#090909; --surface:#131313; --surface-2:#1a1a1a; --ink:#f3f3f3; --ink-2:#d2d2d2; --muted:#8e8e8e; --faint:#5c5c5c;
+    --line:#232323; --line-2:#363636; --fill:rgba(255,255,255,.06); --shadow:0 30px 90px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#090909; --surface:#131313; --surface-2:#1a1a1a; --ink:#f3f3f3; --ink-2:#d2d2d2; --muted:#8e8e8e; --faint:#5c5c5c;
+  --line:#232323; --line-2:#363636; --fill:rgba(255,255,255,.06); --shadow:0 30px 90px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.navin{display:flex;align-items:center;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em;text-decoration:none;white-space:nowrap}
+.brand svg{width:28px;height:28px}
+.links{display:flex;gap:22px;font-size:14.5px;color:var(--muted)}
+.links a{text-decoration:none}
+.links a:hover{color:var(--ink)}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font:600 14.5px var(--sans);padding:10px 16px;border-radius:11px;text-decoration:none;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn svg{width:17px;height:17px}
+.theme{width:40px;justify-content:center;padding:10px 0}
+
+/* hero */
+.hero{padding:76px 0 30px;text-align:center}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font:600 12.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-2);border-radius:99px;padding:6px 14px}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--ink);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.2}}
+h1{font-size:clamp(40px,6.4vw,76px);line-height:1.02;letter-spacing:-.045em;margin:22px auto 0;max-width:900px}
+.sub{font-size:clamp(17px,2vw,20px);color:var(--ink-2);max-width:720px;margin:22px auto 0}
+.ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.ctas .btn{padding:13px 20px;font-size:15.5px}
+.shot{margin:56px auto 0;border-radius:18px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow)}
+.caption{font-size:13px;color:var(--muted);margin-top:14px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:60px 0 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.stat b{display:block;font:700 34px/1.1 var(--mono);letter-spacing:-.03em}
+.stat span{font-size:14px;color:var(--muted)}
+
+/* sections */
+section{padding:96px 0 0}
+.kicker{font:600 12.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h2{font-size:clamp(30px,4vw,46px);line-height:1.08;letter-spacing:-.035em;margin:10px 0 0;max-width:760px}
+.lead{font-size:18px;color:var(--ink-2);max-width:720px;margin:16px 0 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px}
+.card svg{width:30px;height:30px;margin-bottom:14px}
+.card h3{margin:0;font-size:18px;letter-spacing:-.01em}
+.card p{margin:8px 0 0;color:var(--muted);font-size:15px}
+
+/* split */
+.split{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center;margin-top:44px}
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{display:flex;gap:16px;align-items:flex-start}
+.step .n{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font:700 14px var(--mono)}
+.step h3{margin:3px 0 2px;font-size:17px}
+.step p{margin:0;color:var(--muted);font-size:15px}
+.frame{border-radius:16px;overflow:hidden;border:1px solid var(--line-2);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:22px}
+th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.mono{font-size:13.5px}
+.badge{display:inline-block;font:600 11.5px var(--sans);padding:2px 9px;border-radius:99px;border:1px solid var(--line-2)}
+.badge.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:40px}
+.gallery figure{margin:0}
+.gallery a{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);transition:transform .2s}
+.gallery a:hover{transform:translateY(-3px)}
+.gallery img{aspect-ratio:16/10;object-fit:cover;object-position:top}
+.gallery figcaption{font-size:14.5px;margin-top:10px}
+.gallery figcaption span{color:var(--muted)}
+
+/* flow */
+.flow{display:flex;align-items:stretch;gap:0;margin-top:40px;flex-wrap:wrap}
+.node{flex:1;min-width:170px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.node b{display:block;font-size:16px}
+.node span{font-size:13.5px;color:var(--muted)}
+.arrow{display:flex;align-items:center;justify-content:center;width:44px;color:var(--faint);font:600 20px var(--mono)}
+.note{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ink);border-radius:12px;padding:18px 20px;color:var(--ink-2);font-size:15.5px}
+
+/* ai */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.chip{border:1px solid var(--line-2);border-radius:99px;padding:8px 16px;font-weight:600;font-size:14.5px;background:var(--surface)}
+pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;overflow-x:auto;font:14px/1.6 var(--mono);position:relative}
+pre .c{color:var(--muted)}
+.copy{position:absolute;top:12px;right:12px;font:600 12px var(--sans);padding:6px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.code-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.code-grid h3{font-size:16px;margin:0 0 10px}
+
+/* author */
+.author{margin-top:110px;background:var(--ink);color:var(--bg);border-radius:26px;padding:56px;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center}
+.author .kicker{color:color-mix(in srgb,var(--bg) 60%,transparent)}
+.author h2{color:var(--bg)}
+.author p{color:color-mix(in srgb,var(--bg) 78%,transparent);font-size:17px;margin:14px 0 0;max-width:560px}
+.author .btn{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.author .btn.ghost{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent)}
+.author .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fact{border:1px solid color-mix(in srgb,var(--bg) 22%,transparent);border-radius:16px;padding:18px}
+.fact b{display:block;font:700 28px/1.1 var(--mono)}
+.fact span{font-size:13.5px;color:color-mix(in srgb,var(--bg) 70%,transparent)}
+
+footer{margin-top:90px;border-top:1px solid var(--line);padding:30px 0 44px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+footer a{text-decoration:none}
+footer a:hover{color:var(--ink)}
+
+@media (max-width:900px){
+  .links{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:1fr 1fr}
+  .split,.author,.code-grid{grid-template-columns:1fr}
+  .author{padding:36px 26px}
+  .arrow{transform:rotate(90deg);width:100%;height:30px}
+  .flow{flex-direction:column}
+}
+.brand .short{display:none}
+@media (max-width:600px){
+  .brand .full{display:none}
+  .brand .short{display:inline}
+  .navin{gap:10px}
+  .wrap{padding:0 16px}
+  .grid,.gallery{grid-template-columns:1fr}
+  .hero{padding-top:48px}
+  .navin .btn.hide-sm{display:none}
+  .facts{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap navin">
+    <a class="brand" href="#top" aria-label="CAR OBD Dashboard AI">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M7 21a9 9 0 1 1 18 0" fill="none" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round"/><path d="M16 21l5-6" stroke="var(--bg)" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span class="full">CAR OBD Dashboard AI</span><span class="short">CAR OBD</span>
+    </a>
+    <div class="links"><a href="#features">Features</a><a href="#hidden">Hidden data</a><a href="#screens">Screens</a><a href="#how">How it works</a><a href="#start">Get started</a></div>
+    <div class="spacer"></div>
+    <a class="btn hide-sm" href="https://www.navygeeks.in" target="_blank" rel="noopener">navygeeks.in</a>
+    <a class="btn primary" href="https://github.com/navyansh1/CAR-OBD-Dashboard-AI" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+    <button class="btn theme" id="themeBtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+  </div>
+</nav>
+
+<main id="top" class="wrap">
+  <header class="hero">
+    <span class="eyebrow"><i></i>Open source · macOS · any ELM327</span>
+    <h1>Your car has been talking all along.</h1>
+    <p class="sub">Plug a ₹500 Bluetooth OBD scanner into your car and see everything its computers know: live, in plain English, on your Mac. Then crack the data the manufacturer keeps hidden.</p>
+    <div class="ctas">
+      <a class="btn primary" href="https://github.com/navyansh1/CAR-OBD-Dashboard-AI" target="_blank" rel="noopener">Get it on GitHub</a>
+      <a class="btn" href="#start">Try it without a car</a>
+    </div>
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="screenshots/hero-light.png">
+      <img class="shot" id="heroImg" src="screenshots/hero-dark.png" width="1440" height="900" alt="Live dashboard showing engine speed and road speed gauges, engine temperature, battery, cylinder health and Hyundai hidden data">
+    </picture>
+    <p class="caption">A real drive in a 2015 Hyundai Creta, replayed. Every number on screen came from the car.</p>
+
+    <div class="stats">
+      <div class="stat"><b>26+</b><span>live sensors, explained in plain English</span></div>
+      <div class="stat"><b>6</b><span>separate computers found in one car</span></div>
+      <div class="stat"><b>3–7 s</b><span>self-healing Bluetooth reconnect</span></div>
+      <div class="stat"><b>0</b><span>writes to your car: read only, always</span></div>
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="kicker">What you get</div>
+    <h2>Everything a scan app shows, and everything it doesn't.</h2>
+    <p class="lead">Every reading has an <b>ⓘ</b> that says what it is and what's normal, so anyone watching can follow along.</p>
+    <div class="grid">
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/></svg><h3>Live gauges</h3><p>rpm, speed, temperatures, battery, throttle, fuel trims, O2 sensors, spark timing, with sparklines and highs/lows.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"/><rect x="8" y="12" width="8" height="5" rx="1"/><path d="M12 1v3"/></svg><h3>Cylinder health</h3><p>Misfire counts for each cylinder, this trip and the last ten trips. Most scan apps never show these.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg><h3>Health check</h3><p>Fault codes, self-tests, and the engine's own lab report: catalyst efficiency, O2 sensor response, valve timing.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 20V8l7-4 7 4v12"/><path d="M9 20v-6h6v6"/></svg><h3>Mileage & trip cost</h3><p>Live km/L, fuel used, trip cost in ₹, money spent idling, 0–60 timers, and fill-up calibration.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 17l5-6 4 3 5-7 4 4"/><path d="M3 21h18"/></svg><h3>Past trips</h3><p>Every drive saved second by second. Scrub across synced charts with exact timestamps and highlights.</p></div>
+      <div class="card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="7" height="6" rx="1"/><rect x="14" y="5" width="7" height="6" rx="1"/><rect x="8.5" y="14" width="7" height="6" rx="1"/><path d="M6.5 11v1.5h11V11M12 12.5V14"/></svg><h3>Every computer</h3><p>Engine, ABS, steering, cluster, body, climate: identity, build dates and their own fault lists.</p></div>
+    </div>
+  </section>
+
+  <section id="hidden">
+    <div class="kicker">The fun part</div>
+    <h2>Cracking the data your car's maker doesn't document.</h2>
+    <div class="split">
+      <div>
+        <p class="lead" style="margin-top:0">The Creta's engine computer hides 14 private data blocks of 32 numbers each. Nobody publishes what's inside. So the dashboard learns it while you drive.</p>
+        <div class="steps" style="margin-top:26px">
+          <div class="step"><div class="n">1</div><div><h3>Drive</h3><p>Every private block is re-read during the drive, with the standard readings taken just before and after.</p></div></div>
+          <div class="step"><div class="n">2</div><div><h3>Correlate</h3><p>Every byte, 16-bit word and signed value is compared against rpm, speed, pressure, timing and more.</p></div></div>
+          <div class="step"><div class="n">3</div><div><h3>Crack</h3><p>A value that moves in perfect step with a known reading, using a sensible scale, gets named. The formula comes for free.</p></div></div>
+        </div>
+        <table>
+          <tr><th>Hidden value</th><th>Where</th><th>Result</th></tr>
+          <tr><td>Road speed</td><td class="mono">21 02 · byte 12</td><td><span class="badge solid">Cracked</span> r 0.99</td></tr>
+          <tr><td>Engine speed</td><td class="mono">21 01 · bytes 7–8</td><td><span class="badge solid">Cracked</span> r 0.96</td></tr>
+          <tr><td>Spark timing, per cylinder</td><td class="mono">21 07 · bytes 4–7</td><td><span class="badge">Likely</span></td></tr>
+        </table>
+      </div>
+      <a class="frame" href="screenshots/hidden-data.png" target="_blank" rel="noopener"><img src="screenshots/hidden-data.png" loading="lazy" alt="Hidden data lab with discoveries and byte maps"></a>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="kicker">Screens</div>
+    <h2>Built to be read on a screen share.</h2>
+    <div class="gallery">
+      <figure><a href="screenshots/health-check.png" target="_blank" rel="noopener"><img src="screenshots/health-check.png" loading="lazy" alt="Health check"></a><figcaption><b>Health check</b> <span>· verdict, codes, self-tests, lab report</span></figcaption></figure>
+      <figure><a href="screenshots/past-trips.png" target="_blank" rel="noopener"><img src="screenshots/past-trips.png" loading="lazy" alt="Past trips"></a><figcaption><b>Past trips</b> <span>· second-by-second charts with crosshair</span></figcaption></figure>
+      <figure><a href="screenshots/my-car.png" target="_blank" rel="noopener"><img src="screenshots/my-car.png" loading="lazy" alt="My car"></a><figcaption><b>My car</b> <span>· identity, ECU software, computers found</span></figcaption></figure>
+      <figure><a href="screenshots/mileage-trip.png" target="_blank" rel="noopener"><img src="screenshots/mileage-trip.png" loading="lazy" alt="Mileage and trip"></a><figcaption><b>Mileage & trip</b> <span>· km/L, fuel used, cost in ₹</span></figcaption></figure>
+      <figure><a href="screenshots/under-the-hood.png" target="_blank" rel="noopener"><img src="screenshots/under-the-hood.png" loading="lazy" alt="Under the hood"></a><figcaption><b>Under the hood</b> <span>· raw replies for the curious</span></figcaption></figure>
+      <figure><a href="screenshots/swift-live.png" target="_blank" rel="noopener"><img src="screenshots/swift-live.png" loading="lazy" alt="Suzuki Swift profile"></a><figcaption><b>Second car</b> <span>· 2010 Suzuki Swift, auto-detected</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="kicker">How it works</div>
+    <h2>Four small pieces, no cloud.</h2>
+    <div class="flow">
+      <div class="node"><b>Your car</b><span>Engine, ABS, cluster… on the CAN bus</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>ELM327</b><span>Any cheap Bluetooth OBD adapter</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>OBD Bridge</b><span>Self-healing Bluetooth link</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Dashboard</b><span>Python server + one HTML page on your Mac</span></div>
+    </div>
+    <div class="note"><b>The macOS Bluetooth bug, fixed.</b> On Apple Silicon Macs, once a program closes a Bluetooth serial port, it never passes data again until Bluetooth restarts. OBD Bridge talks to the adapter directly through Apple's IOBluetooth, keeps the link open, and repairs it on its own when it drops.</div>
+  </section>
+
+  <section id="ai">
+    <div class="kicker">Bring your own AI</div>
+    <h2>Works with any AI assistant.</h2>
+    <p class="lead">Nothing is tied to one model. Everything the dashboard knows is plain JSON on your Mac, so any assistant can read it, and any AI coding tool can extend it.</p>
+    <div class="chips"><span class="chip">Claude</span><span class="chip">ChatGPT</span><span class="chip">Cursor</span><span class="chip">Antigravity</span><span class="chip">Gemini</span><span class="chip">Copilot</span></div>
+    <div class="code-grid">
+      <div><h3>Ask about your car</h3><pre><button class="copy">Copy</button><span class="c"># live values, health, computers, decoded fields</span>
+curl http://127.0.0.1:8327/api/state
+
+<span class="c"># every saved trip</span>
+curl http://127.0.0.1:8327/api/trips</pre></div>
+      <div><h3>Then ask</h3><pre><span class="c">›</span> Is anything wrong with my engine?
+<span class="c">›</span> Why was my last trip's mileage low?
+<span class="c">›</span> Add a profile for my car and a
+  gauge for oil temperature.</pre></div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="kicker">Get started</div>
+    <h2>Two minutes to your first reading.</h2>
+    <p class="lead">You need a Mac, Python 3.11+, the Xcode command line tools and any ELM327 Bluetooth adapter. No car handy? Replay mode plays back real recorded drives.</p>
+    <div class="code-grid">
+      <div><h3>Install</h3><pre><button class="copy">Copy</button>git clone https://github.com/navyansh1/CAR-OBD-Dashboard-AI.git
+cd CAR-OBD-Dashboard-AI
+./setup.sh</pre></div>
+      <div><h3>Run</h3><pre><button class="copy">Copy</button><span class="c"># no car needed</span>
+./start.sh --replay
+
+<span class="c"># with your car (pair the adapter first)</span>
+./start.sh</pre></div>
+    </div>
+    <div class="note"><b>Read only, by design.</b> The dashboard never clears fault codes and never sends anything that writes, resets or unlocks. When the car is off it goes quiet so the car's computers can sleep.</div>
+  </section>
+
+  <aside class="author" aria-label="About the author">
+    <div>
+      <div class="kicker">Built by</div>
+      <h2>Navyansh Kothari</h2>
+      <p>AI/ML engineer, app developer and the creator behind <b>NavyGeeks</b>, a tech channel with 400k+ views. More projects, research papers and videos live on navygeeks.in.</p>
+      <div class="row">
+        <a class="btn" href="https://www.navygeeks.in" target="_blank" rel="noopener">Visit navygeeks.in</a>
+        <a class="btn ghost" href="https://www.youtube.com/@navygeeks" target="_blank" rel="noopener">YouTube</a>
+        <a class="btn ghost" href="https://www.instagram.com/navygeeks/" target="_blank" rel="noopener">Instagram</a>
+        <a class="btn ghost" href="https://www.linkedin.com/in/navyansh/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>400k+</b><span>views on NavyGeeks</span></div>
+      <div class="fact"><b>18</b><span>projects on navygeeks.in</span></div>
+      <div class="fact"><b>70</b><span>tech videos</span></div>
+      <div class="fact"><b>2</b><span>real cars tested here</span></div>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>CAR OBD Dashboard AI · MIT License</span>
+    <span><a href="https://github.com/navyansh1/CAR-OBD-Dashboard-AI">GitHub</a> · <a href="https://www.navygeeks.in">navygeeks.in</a> · <a href="https://www.youtube.com/@navygeeks">YouTube</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const root = document.documentElement, KEY = "obd-site-theme";
+  try { const t = localStorage.getItem(KEY); if (t) root.dataset.theme = t; } catch(e){}
+  const heroFor = (t) => t === "light" ? "screenshots/hero-light.png" : "screenshots/hero-dark.png";
+  function syncHero(){
+    const t = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const pic = document.getElementById("heroImg").parentElement;
+    pic.querySelector("source").srcset = heroFor(t);
+    document.getElementById("heroImg").src = heroFor(t);
+  }
+  syncHero();
+  document.getElementById("themeBtn").onclick = () => {
+    const cur = root.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    root.dataset.theme = cur === "dark" ? "light" : "dark";
+    try { localStorage.setItem(KEY, root.dataset.theme); } catch(e){}
+    syncHero();
+  };
+  document.querySelectorAll(".copy").forEach(b => b.onclick = async () => {
+    const text = [...b.parentElement.childNodes].filter(n => n !== b).map(n => n.textContent).join("")
+      .split("\n").filter(l => !l.trim().startsWith("#")).join("\n").trim();
+    try { await navigator.clipboard.writeText(text); b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1500); } catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

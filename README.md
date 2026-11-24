@@ -10,6 +10,8 @@ Works with any AI assistant: Claude, ChatGPT, Cursor, Antigravity, Gemini.
 
 **macOS (Apple Silicon)** · **Python 3.11+** · **any ELM327 Bluetooth adapter** · **read-only, never writes to the car**
 
+**[Website](https://navyansh1.github.io/CAR-OBD-Dashboard-AI/)** · **[navygeeks.in](https://www.navygeeks.in)** · **[YouTube](https://www.youtube.com/@navygeeks)**
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/hero-light.png">
   <img alt="Live dashboard: engine speed and road speed gauges, engine temperature, battery, cylinder health and Hyundai hidden data" src="docs/screenshots/hero-dark.png">
@@ -180,6 +182,12 @@ makes work fine with standard OBD.
 - [python-OBD](https://github.com/brendan-w/python-OBD) for the OBD-II command set.
 - Hyundai Mode 22 definitions from [gdincu/HyundaiElantraCN7_OBD2_PIDs](https://github.com/gdincu/HyundaiElantraCN7_OBD2_PIDs).
 - Suzuki Swift definitions from the open [OBDb](https://github.com/OBDb/Suzuki-Swift) database.
+
+## Author
+
+Made by **Navyansh Kothari**: AI/ML engineer and creator of the NavyGeeks tech channel.
+More projects, research and videos at **[navygeeks.in](https://www.navygeeks.in)** ·
+[YouTube](https://www.youtube.com/@navygeeks) · [Instagram](https://www.instagram.com/navygeeks/) · [LinkedIn](https://www.linkedin.com/in/navyansh/)
 
 ## License
 
