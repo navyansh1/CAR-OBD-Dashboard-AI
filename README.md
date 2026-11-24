@@ -168,4 +168,8 @@ makes work fine with standard OBD.
 - Suzuki Swift definitions from the open [OBDb](https://github.com/OBDb/Suzuki-Swift) database.
 - Built with [Claude Code](https://claude.com/claude-code).
 
+## License
+
+[MIT](LICENSE). The bundled manufacturer definitions come from the projects credited above, under their own terms.
+
 <sub>Use at your own risk. Don't look at the dashboard while driving.</sub>
